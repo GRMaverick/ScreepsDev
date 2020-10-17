@@ -74,6 +74,55 @@ module.exports.Update = function(_creep)
 		task = _creep.memory.tasks[_creep.memory.tasks.length-1];
 	}
 
+	// Pop Task
+	switch(task.id)
+	{
+		case ServiceCreepConfig.PRIORITY_BUILD:
+		{
+			let targets = _creep.room.find(FIND_CONSTRUCTION_SITES);
+			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0)
+			{
+				delete _creep.memory.tasks[_creep.memory.tasks.length];
+				_creep.memory.tasks.pop();
+			}
+			break;
+		}
+		case ServiceCreepConfig.PRIORITY_HARVEST:
+			if(_creep.store.getFreeCapacity() == 0)
+			{
+				debugger;
+				delete _creep.memory.tasks[_creep.memory.tasks.length];
+				_creep.memory.tasks.pop();
+			}
+			break;
+		case ServiceCreepConfig.PRIORITY_REPAIR:
+			break;
+		case ServiceCreepConfig.PRIORITY_UPGRADE:
+			if(_creep.store.getUsedCapacity() == 0)
+			{
+				delete _creep.memory.tasks[_creep.memory.tasks.length];
+				_creep.memory.tasks.pop();
+			}
+			break;
+		case ServiceCreepConfig.PRIORITY_DELIVER:
+		{
+			debugger;
+			let targets = _creep.room.find(FIND_STRUCTURES, {
+				filter: (structure) => {
+					return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
+					   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+				}
+			});
+
+			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0)
+			{
+				delete _creep.memory.tasks[_creep.memory.tasks.length];
+				_creep.memory.tasks.pop();
+			}
+			break;
+		}
+	}
+
 	// Push Task
 	let bTaskAdded = false;
 	for(var prioIdx = 0; prioIdx < _creep.memory.priorities.length; prioIdx++)
@@ -142,7 +191,14 @@ module.exports.Update = function(_creep)
 			}
 			case ServiceCreepConfig.PRIORITY_UPGRADE:
 			{
-				if(task.id != ServiceCreepConfig.PRIORITY_UPGRADE && _creep.store.getFreeCapacity() == 0)
+				let targets = _creep.room.find(FIND_STRUCTURES, {
+					filter: (structure) => {
+						return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
+						   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+					}
+				});
+
+				if(task.id != ServiceCreepConfig.PRIORITY_UPGRADE && _creep.store.getFreeCapacity() == 0 && targets.length == 0)
 				{
 					var taskdata = {
 						id: ServiceCreepConfig.PRIORITY_UPGRADE,
@@ -180,7 +236,7 @@ module.exports.Update = function(_creep)
 		_creep.say("No Task Assigned");
 		return;
 	}
-	
+
 	switch(task.id)
 	{
 		case ServiceCreepConfig.PRIORITY_BUILD:
@@ -198,48 +254,5 @@ module.exports.Update = function(_creep)
 		case ServiceCreepConfig.PRIORITY_DELIVER:
 			Services.Deliver(_creep, task.data);
 			break;
-	}
-
-	// Pop Task
-	switch(task.id)
-	{
-		case ServiceCreepConfig.PRIORITY_BUILD:
-		{
-			let targets = _creep.room.find(FIND_CONSTRUCTION_SITES);
-			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0)
-			{
-				_creep.memory.tasks.pop();
-			}
-			break;
-		}
-		case ServiceCreepConfig.PRIORITY_HARVEST:
-			if(_creep.store.getFreeCapacity() == 0)
-			{
-				_creep.memory.tasks.pop();
-			}
-			break;
-		case ServiceCreepConfig.PRIORITY_REPAIR:
-			break;
-		case ServiceCreepConfig.PRIORITY_UPGRADE:
-			if(_creep.store.getUsedCapacity() == 0)
-			{
-				_creep.memory.tasks.pop();
-			}
-			break;
-		case ServiceCreepConfig.PRIORITY_DELIVER:
-		{
-			let targets = _creep.room.find(FIND_STRUCTURES, {
-				filter: (structure) => {
-					return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
-					   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-				}
-			});
-
-			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0)
-			{
-				_creep.memory.tasks.pop();
-			}
-			break;
-		}
 	}
 };
