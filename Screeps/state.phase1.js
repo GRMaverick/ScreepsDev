@@ -6,9 +6,9 @@ module.exports.StateConfig = require('config.state.phase1');
 
 module.exports.OnExecute = function()
 {
-  debugger;
-  console.log("State.Phase1: OnExecute");
-  SpawnAction(configHarvester, "Spawn1");
+	debugger;
+  //console.log("State.Phase1: OnExecute");
+  //SpawnAction(configHarvester, "Spawn1");
 };
 
 module.exports.OnEnter = function()

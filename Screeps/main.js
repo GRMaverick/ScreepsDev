@@ -1,9 +1,7 @@
-var roleHarvester = require('role.harvester');
-var roleUpgrader = require('role.upgrader');
-var roleBuilder = require('role.builder');
-var roleRepairer = require('role.repairer');
+var ServiceCreepConfig = require('config.role.service');
+var ServiceCreep = require('role.service');
 
-var stateMachine = require('manager.state');
+//var stateMachine = require('manager.state');
 
 function ClearDead()
 {
@@ -22,32 +20,20 @@ function UpdateCreeps()
     for(var name in Game.creeps)
     {
         var creep = Game.creeps[name];
-        if(creep.memory.role == 'Harvester')
-        {
-            roleHarvester.run(creep);
-        }
-        if(creep.memory.role == 'Upgrader')
-        {
-            roleUpgrader.run(creep);
-        }
-        if(creep.memory.role == 'Builder')
-        {
-            roleBuilder.run(creep);
-        }
-        if(creep.memory.role == 'Repairer')
-        {
-            roleRepairer.run(creep);
-        }
+
+		ServiceCreep.Update(creep);
     }
 }
 
 module.exports.loop = function ()
 {
-    //Memory = JSON.parse(RawMemory.get());
-
     ClearDead();
-    UpdateCreeps();
-    stateMachine.Update();
 
-    RawMemory.set(JSON.stringify(Memory));
+	ServiceCreep.Create(ServiceCreepConfig.Harvester);
+
+    UpdateCreeps();
+
+    //stateMachine.Update();
+
+    //RawMemory.set(JSON.stringify(Memory));
 }

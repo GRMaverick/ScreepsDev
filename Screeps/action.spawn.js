@@ -46,7 +46,7 @@ module.exports = function(_config, _spawn)
         var name = _config.Role+Game.time;
         console.log("Spawning: "+name+" - Cost: "+CalculateCost(_config.BigBody));
         Game.spawns[_spawn].spawnCreep(_config.BigBody, name);
-        Game.creeps[name].memory = { role:_config.Role, size:"big" };
+        Game.creeps[name].memory = { role:_config.Role, size:"big", priorities:_config.Priorities };
     }
 
     var vSmallCreeps = _.filter(Game.creeps, {memory:{role:_config.Role, size:"small"}});
@@ -56,6 +56,6 @@ module.exports = function(_config, _spawn)
         var name = _config.Role+Game.time;
         console.log("Spawning: "+name+" - Cost: "+CalculateCost(_config.SmallBody));
         Game.spawns[_spawn].spawnCreep(_config.SmallBody, name);
-        Game.creeps[name].memory = { role:_config.Role, size:"small" };
+        Game.creeps[name].memory = { role:_config.Role, size:"small", priorities:_config.Priorities };
     }
 };
