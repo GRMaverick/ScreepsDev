@@ -15,13 +15,33 @@ function ClearDead()
     }
 }
 
+function SpawnCreeps()
+{
+	if(ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1") === true)
+	{
+		return;
+	}
+
+	// if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
+	// {
+	// 	return;
+	// }
+
+	if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true)
+	{
+		return;
+	}
+}
+
 function UpdateCreeps()
 {
     for(var name in Game.creeps)
     {
         var creep = Game.creeps[name];
-
-		ServiceCreep.Update(creep);
+		if(creep.spawning === false)
+		{
+			ServiceCreep.Update(creep);
+		}
     }
 }
 
@@ -29,8 +49,7 @@ module.exports.loop = function ()
 {
     ClearDead();
 
-	ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1");
-
+	SpawnCreeps();
     UpdateCreeps();
 
     //stateMachine.Update();

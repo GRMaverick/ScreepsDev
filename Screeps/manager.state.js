@@ -29,6 +29,7 @@ function ChangeState(_state)
     CurrentState = _state;
     CurrentState.OnEnter();
 }
+
 function GetState(_stateName)
 {
   var states = _.filter(gStateList, {Name:_stateName});
@@ -88,7 +89,7 @@ module.exports =
             console.log("State Init");
             ChangeState(phase1State);
         }
-        
+
         console.log("Executing: " + CurrentState.Name);
         CurrentState.OnExecute();
 

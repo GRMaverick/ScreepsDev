@@ -1,53 +1,115 @@
-module.exports.Build = function(_creep)
+function HandleError(_funcName, _result)
 {
-	var targets = _creep.room.find(FIND_CONSTRUCTION_SITES);
-	if(targets.length)
+	switch(_result)
 	{
-		if(_creep.build(targets[0]) == ERR_NOT_IN_RANGE)
-		{
-			_creep.moveTo(targets[0]);
-			//_creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
-		}
+		case ERR_NOT_OWNER:
+			console.log(_funcName+": ERROR_NOT_OWNER");
+			break;
+		case ERR_BUSY:
+			console.log(_funcName+": ERR_BUSY");
+			break;
+		case ERR_NOT_FOUND:
+			console.log(_funcName+": ERR_NOT_FOUND");
+			break;
+		case ERR_NOT_ENOUGH_RESOURCES:
+			console.log(_funcName+": ERR_NOT_ENOUGH_RESOURCES");
+			break;
+		case ERR_INVALID_TARGET:
+			console.log(_funcName+": ERR_INVALID_TARGET");
+			break;
+		case ERR_NOT_IN_RANGE:
+			console.log(_funcName+": ERR_NOT_IN_RANGE");
+			break;
+		case ERR_TIRED:
+			console.log(_funcName+": ERR_TIRED");
+			break;
+		case ERR_NO_BODYPART:
+			console.log(_funcName+": ERR_NO_BODYPART");
+			break;
+	}
+}
+
+module.exports.Build = function(_creep, _data)
+{
+	let target = Game.getObjectById(_data.targetId);
+	let result = _creep.build(target);
+	if(result == ERR_NOT_IN_RANGE)
+	{
+		_creep.moveTo(target);
+		//creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+		return true;
+	}
+	else if(result != OK)
+	{
+		HandleError("Build", result);
+		return false;
 	}
 };
 
-module.exports.Deliver = function(_creep, _target)
+module.exports.Deliver = function(_creep, _data)
 {
-	if(_creep.transfer(_target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+	let target = Game.getObjectById(_data.targetId);
+	let result = _creep.transfer(target, RESOURCE_ENERGY);
+	if(result == ERR_NOT_IN_RANGE)
 	{
-		_creep.moveTo(_target);
-		//creep.moveTo(_target, {visualizePathStyle: {stroke: '#ffffff'}});
+		_creep.moveTo(target);
+		//creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+		return true;
+	}
+	else if(result != OK)
+	{
+		HandleError("Deliver", result);
+		return false;
 	}
 };
 
-module.exports.Harvest = function(_creep)
+module.exports.Harvest = function(_creep, _data)
 {
-	var sources = _creep.room.find(FIND_SOURCES);
-    if(_creep.harvest(sources[0]) == ERR_NOT_IN_RANGE)
-    {
-        _creep.moveTo(sources[0]);
-        //_creep.moveTo(sources[0], {visualizePathStyle: {stroke: '#ffAA00'}});
-    }
-};
-
-module.exports.Repair = function(_creep)
-{
-	var targets = _creep.room.find(FIND_STRUCTURES);
-	if( targets.length && (targets[0].hits < ( targets[0].hitsMax * MaxHitsThreshold ) ) )
+	let target = Game.getObjectById(_data.targetId);
+	let result = _creep.harvest(target);
+	if(result == ERR_NOT_IN_RANGE)
 	{
-		if(_creep.repair(targets[0]) == ERR_NOT_IN_RANGE)
-		{
-			_creep.moveTo(targets[0]);
-			//_creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
-		}
+		_creep.moveTo(target);
+		//creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+		return true;
+	}
+	else if(result != OK)
+	{
+		HandleError("Harvest", result);
+		return false;
 	}
 };
 
-module.exports.Upgrade = function(_creep)
+module.exports.Repair = function(_creep, _data)
 {
-	if(_creep.upgradeController(_creep.room.controller) == ERR_NOT_IN_RANGE)
+	let target = Game.getObjectById(_data.targetId);
+	let result = _creep.repair(target);
+	if(result == ERR_NOT_IN_RANGE)
 	{
-		_creep.moveTo(_creep.room.controller);
-		//_creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+		_creep.moveTo(target);
+		//creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+		return true;
+	}
+	else if(result != OK)
+	{
+		HandleError("Repair", result);
+		return false;
+	}
+};
+
+module.exports.Upgrade = function(_creep, _data)
+{
+	let target = Game.getObjectById(_data.targetId);
+	let result = _creep.upgradeController(target);
+	if(result === ERR_NOT_IN_RANGE)
+	{
+		_creep.moveTo(target);
+		//creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+		return true;
+	}
+	else if(result != OK)
+	{
+		HandleError("Upgrade", result);
+		return false;
 	}
 };
