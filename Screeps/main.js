@@ -1,5 +1,5 @@
-var ServiceCreepConfig = require('config.role.service');
-var ServiceCreep = require('role.service');
+var ServiceCreepConfig = require('role.service.config');
+var ServiceCreep = require('role.service.creep');
 
 //var stateMachine = require('manager.state');
 
@@ -29,7 +29,7 @@ module.exports.loop = function ()
 {
     ClearDead();
 
-	ServiceCreep.Create(ServiceCreepConfig.Harvester);
+	ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1");
 
     UpdateCreeps();
 

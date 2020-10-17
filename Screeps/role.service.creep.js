@@ -1,3 +1,6 @@
+var Services = require('role.service.actions');
+var ServiceCreepConfig = require('role.service.config');
+
 function CalculateCost(_body)
 {
     var cost = 0;
@@ -34,9 +37,70 @@ function CalculateCost(_body)
     return cost;
 }
 
-module.exports = function(_config, _spawn)
+function Harvest(_creep)
 {
-    if( Game.spawns[_spawn].spawning )
+	if(_creep.store.getFreeCapacity() > 0)
+	{
+		_creep.say("Harvesting");
+		Services.Harvest(_creep);
+		return true;
+	}
+	else
+	{
+		var resourceTargets = _creep.room.find(FIND_STRUCTURES, {
+			filter: (structure) => {
+				return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
+				   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+			}
+		});
+
+		if(resourceTargets.length > 0)
+		{
+			_creep.say("Delivering");
+			Services.Deliver(_creep, resourceTargets[0]);
+			return true;
+		}
+	}
+	return false;
+}
+
+function Build(_creep)
+{
+	var constructionTargets = _creep.room.find(FIND_CONSTRUCTION_SITES);
+	if(constructionTargets.length > 0)
+	{
+		_creep.say("Building");
+		Services.Build(_creep);
+		return true;
+	}
+	return false;
+}
+
+function Upgrade(_creep)
+{
+    if(!_creep.memory.upgrading && _creep.store.getFreeCapacity() == 0)
+	{
+		_creep.say("Upgrading");
+        Services.Upgrade(_creep);
+		return true;
+    }
+	return false;
+}
+
+function Repair(_creep)
+{
+	if(!_creep.memory.repairing && _creep.store.getFreeCapacity() == 0)
+	{
+		_creep.say("Repairing");
+		Services.Repair(_creep);
+		return true;
+	}
+	return false;
+}
+
+module.exports.Create = function(_config, _spawn)
+{
+	if( Game.spawns[_spawn].spawning )
         return;
 
     var vBigCreeps = _.filter(Game.creeps, {memory:{role:_config.Role, size:"big"}});
@@ -58,4 +122,39 @@ module.exports = function(_config, _spawn)
         Game.spawns[_spawn].spawnCreep(_config.SmallBody, name);
         Game.creeps[name].memory = { role:_config.Role, size:"small", priorities:_config.Priorities };
     }
+};
+
+module.exports.Update = function(_creep)
+{
+	for(var prioIdx = 0; prioIdx < _creep.memory.priorities.length; prioIdx++)
+	{
+		let priority = _creep.memory.priorities[prioIdx];
+		switch(priority)
+		{
+			case ServiceCreepConfig.PRIORITY_BUILD:
+				if(Build(_creep) === true)
+				{
+					return;
+				}
+				break;
+			case ServiceCreepConfig.PRIORITY_HARVEST:
+				if(Harvest(_creep) === true)
+				{
+					return;
+				}
+				break;
+			case ServiceCreepConfig.PRIORITY_REPAIR:
+				if(Repair(_creep) === true)
+				{
+					return;
+				}
+				break;
+			case ServiceCreepConfig.PRIORITY_UPGRADE:
+				if(Upgrade(_creep) === true)
+				{
+					return;
+				}
+				break;
+		}
+	}
 };
