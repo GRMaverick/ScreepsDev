@@ -1,6 +1,8 @@
 var ServiceCreepConfig = require('role.service.config');
 var ServiceCreep = require('role.service.creep');
 
+var Blackboard = require('game.blackboard');
+
 //var stateMachine = require('manager.state');
 
 function ClearDead()
@@ -22,10 +24,10 @@ function SpawnCreeps()
 		return;
 	}
 
-	// if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
-	// {
-	// 	return;
-	// }
+	if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
+	{
+		return;
+	}
 
 	if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true)
 	{
@@ -47,6 +49,8 @@ function UpdateCreeps()
 
 module.exports.loop = function ()
 {
+	Blackboard.Initialise();
+
     ClearDead();
 
 	SpawnCreeps();
@@ -54,5 +58,5 @@ module.exports.loop = function ()
 
     //stateMachine.Update();
 
-    //RawMemory.set(JSON.stringify(Memory));
+    RawMemory.set(JSON.stringify(Memory));
 }

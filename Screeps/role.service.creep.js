@@ -80,7 +80,8 @@ module.exports.Update = function(_creep)
 		case ServiceCreepConfig.PRIORITY_BUILD:
 		{
 			let targets = _creep.room.find(FIND_CONSTRUCTION_SITES);
-			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0)
+			let target = targets.find(element => element.id == task.data.targetId);
+			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0 || target === "undefined")
 			{
 				delete _creep.memory.tasks[_creep.memory.tasks.length];
 				_creep.memory.tasks.pop();
@@ -90,7 +91,6 @@ module.exports.Update = function(_creep)
 		case ServiceCreepConfig.PRIORITY_HARVEST:
 			if(_creep.store.getFreeCapacity() == 0)
 			{
-				debugger;
 				delete _creep.memory.tasks[_creep.memory.tasks.length];
 				_creep.memory.tasks.pop();
 			}
@@ -106,7 +106,6 @@ module.exports.Update = function(_creep)
 			break;
 		case ServiceCreepConfig.PRIORITY_DELIVER:
 		{
-			debugger;
 			let targets = _creep.room.find(FIND_STRUCTURES, {
 				filter: (structure) => {
 					return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
@@ -191,12 +190,16 @@ module.exports.Update = function(_creep)
 			}
 			case ServiceCreepConfig.PRIORITY_UPGRADE:
 			{
-				let targets = _creep.room.find(FIND_STRUCTURES, {
-					filter: (structure) => {
-						return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
-						   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-					}
-				});
+				let targets = [];
+				if(_creep.memory.role != 'Upgrader')
+				{
+					targets = _creep.room.find(FIND_STRUCTURES, {
+						filter: (structure) => {
+							return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
+							   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+						}
+					});
+				}
 
 				if(task.id != ServiceCreepConfig.PRIORITY_UPGRADE && _creep.store.getFreeCapacity() == 0 && targets.length == 0)
 				{
