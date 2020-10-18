@@ -103,80 +103,80 @@ module.exports.Create = function(_config, _spawn)
 
 module.exports.Update = function(_creep)
 {
-	if(creep.spawning || !creep.memory.job)
+	if(_creep.spawning || !_creep.memory.job)
 	{
 		return;
 	}
 
-	if(creep.memory.job.Type == "Construction")
+	if(_creep.memory.job.Type == "Construction")
 	{
-		if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
-			creep.memory.building = false;
-			creep.say('🔄 harvest');
+		if(_creep.memory.building && _creep.store[RESOURCE_ENERGY] == 0) {
+			_creep.memory.building = false;
+			_creep.say('🔄 harvest');
 		}
-		if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
-			creep.memory.building = true;
-			creep.say('⚡ upgrade');
+		if(!_creep.memory.building && _creep.store.getFreeCapacity() == 0) {
+			_creep.memory.building = true;
+			_creep.say('⚡ upgrade');
 		}
 
-		if(creep.memory.building)
+		if(_creep.memory.building)
 		{
-			Services.Build(creep);
+			Services.Build(_creep);
 		}
 		else
 		{
-			Services.Harvest(creep);
+			Services.Harvest(_creep);
 		}
 	}
-	else if (creep.memory.job.Type == "Harvest")
+	else if (_creep.memory.job.Type == "Harvest")
 	{
-		if(harvester.store.getFreeCapacity() == 0)
+		if(_creep.store.getFreeCapacity() == 0)
 		{
-			Services.Deliver(harvester);
+			Services.Deliver(_creep);
 		}
 		else
 		{
-			Services.Harvest(harvester);
+			Services.Harvest(_creep);
 		}
 	}
-	else if (creep.memory.job.Type == "Upgrade")
+	else if (_creep.memory.job.Type == "Upgrade")
 	{
-		if(upgrader.memory.upgrading && upgrader.store[RESOURCE_ENERGY] == 0) {
-			upgrader.memory.upgrading = false;
-			upgrader.say('🔄 harvest');
+		if(_creep.memory.upgrading && _creep.store[RESOURCE_ENERGY] == 0) {
+			_creep.memory.upgrading = false;
+			_creep.say('🔄 harvest');
 		}
-		if(!upgrader.memory.upgrading && upgrader.store.getFreeCapacity() == 0) {
-			upgrader.memory.upgrading = true;
-			upgrader.say('⚡ upgrade');
+		if(!_creep.memory.upgrading && _creep.store.getFreeCapacity() == 0) {
+			_creep.memory.upgrading = true;
+			_creep.say('⚡ upgrade');
 		}
 
-		if(upgrader.memory.upgrading)
+		if(_creep.memory.upgrading)
 		{
-			Services.Upgrade(upgrader);
+			Services.Upgrade(_creep);
 		}
 		else
 		{
-			Services.Harvest(upgrader);
+			Services.Harvest(_creep);
 		}
 	}
-	else if (creep.memory.job.Type == "Repair")
+	else if (_creep.memory.job.Type == "Repair")
 	{
-		if(creep.memory.repairing && creep.store[RESOURCE_ENERGY] == 0) {
-			creep.memory.repairing = false;
-			creep.say('🔄 harvest');
+		if(_creep.memory.repairing && _creep.store[RESOURCE_ENERGY] == 0) {
+			_creep.memory.repairing = false;
+			_creep.say('🔄 harvest');
 		}
-		if(!creep.memory.repairing && creep.store.getFreeCapacity() == 0) {
-			creep.memory.repairing = true;
-			creep.say('⚡ repair');
+		if(!_creep.memory.repairing && _creep.store.getFreeCapacity() == 0) {
+			_creep.memory.repairing = true;
+			_creep.say('⚡ repair');
 		}
 
-		if(creep.memory.repairing)
+		if(_creep.memory.repairing)
 		{
-			Services.Repair(creep);
+			Services.Repair(_creep);
 		}
 		else
 		{
-			Services.Harvest(creep);
+			Services.Harvest(_creep);
 		}
 	}
 };
