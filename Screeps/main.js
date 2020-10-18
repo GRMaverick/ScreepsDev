@@ -2,7 +2,7 @@ var ServiceCreepConfig = require('role.service.config');
 var ServiceCreep = require('role.service.creep');
 
 var Blackboard = require('game.blackboard');
-var Profiler = require('game.profiler');
+const profiler = require('game.profiler');
 
 //var stateMachine = require('manager.state');
 
@@ -48,16 +48,19 @@ function UpdateCreeps()
     }
 }
 
+profiler.enable();
 module.exports.loop = function ()
 {
-	Blackboard.Initialise();
+	profiler.wrap(function()
+	{
+		//console.log("Ryan");
+		Blackboard.Initialise();
 
-    ClearDead();
+		ClearDead();
 
-	//SpawnCreeps();
-    UpdateCreeps();
+		//SpawnCreeps();
+		UpdateCreeps();
 
-    //stateMachine.Update();
-
-    RawMemory.set(JSON.stringify(Memory));
+		//stateMachine.Update();
+	});
 }
