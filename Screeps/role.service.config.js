@@ -11,72 +11,31 @@ module.exports.PRIORITY_UPGRADE 	= PRIORITY_UPGRADE;
 module.exports.PRIORITY_DELIVER 	= PRIORITY_DELIVER;
 
 module.exports.Builder = {
-	SmallMax: 0,
-    BigMax: 0,
+	Min: 2,
     Role: "Builder",
-    SmallBody: [
+    DefaultBody: [
 		WORK,
 		CARRY,
 		MOVE
-	],
-    BigBody: [
-		WORK,
-		WORK,
-		WORK,
-		WORK,
-		CARRY,
-		MOVE
-	],
-	Priorities: [
-		PRIORITY_BUILD,
-		PRIORITY_HARVEST,
-		PRIORITY_UPGRADE
 	]
 };
 
 module.exports.Harvester = {
-	SmallMax: 3,
-    BigMax: 0,
+	Min: 3,
     Role: "Harvester",
-    SmallBody: [
+	DefaultBody: [
 		WORK,
 		CARRY,
 		MOVE
-	],
-    BigBody: [
-		WORK,
-		WORK,
-		WORK,
-		WORK,
-		CARRY,
-		MOVE
-	],
-	Priorities: [
-		PRIORITY_HARVEST,
-		PRIORITY_DELIVER,
-		PRIORITY_UPGRADE
 	]
 };
 
 module.exports.Upgrader = {
-	SmallMax: 3,
-    BigMax: 0,
+	Min: 3,
     Role: "Upgrader",
-    SmallBody: [
+	DefaultBody: [
 		WORK,
 		CARRY,
 		MOVE
-	],
-    BigBody: [
-		WORK,
-		WORK,
-		WORK,
-		WORK,
-		CARRY,
-		MOVE
-	],
-	Priorities: [
-		PRIORITY_HARVEST,
-		PRIORITY_UPGRADE
 	]
 };

@@ -1,3 +1,34 @@
+module.exports.LogError = function(_funcName, _error)
+{
+	switch(_error)
+	{
+		case ERR_NOT_OWNER:
+			console.log(_funcName+": ERROR_NOT_OWNER");
+			break;
+		case ERR_BUSY:
+			console.log(_funcName+": ERR_BUSY");
+			break;
+		case ERR_NOT_FOUND:
+			console.log(_funcName+": ERR_NOT_FOUND");
+			break;
+		case ERR_NOT_ENOUGH_RESOURCES:
+			console.log(_funcName+": ERR_NOT_ENOUGH_RESOURCES");
+			break;
+		case ERR_INVALID_TARGET:
+			console.log(_funcName+": ERR_INVALID_TARGET");
+			break;
+		case ERR_NOT_IN_RANGE:
+			console.log(_funcName+": ERR_NOT_IN_RANGE");
+			break;
+		case ERR_TIRED:
+			console.log(_funcName+": ERR_TIRED");
+			break;
+		case ERR_NO_BODYPART:
+			console.log(_funcName+": ERR_NO_BODYPART");
+			break;
+	}
+}
+
 module.exports.PathEndToEnd = function(_startNode, _endNode)
 {
 	let result = PathFinder.search(
