@@ -2,6 +2,7 @@ var ServiceCreepConfig = require('role.service.config');
 var ServiceCreep = require('role.service.creep');
 
 var Blackboard = require('game.blackboard');
+var Profiler = require('game.profiler');
 
 //var stateMachine = require('manager.state');
 
@@ -53,7 +54,7 @@ module.exports.loop = function ()
 
     ClearDead();
 
-	SpawnCreeps();
+	//SpawnCreeps();
     UpdateCreeps();
 
     //stateMachine.Update();
