@@ -20,7 +20,7 @@ module.exports.OnJobCreated = function(_callback)
 	PostCreatedJob = _callback;
 }
 
-module.exports.AssignCreepToJob = function(_creep) {
+module.exports.AssignCreepToJob = function(_creep, _jobId) {
 	let found = Memory.ControllerJobs.find(element => element.Id == _jobId);
 	if(found != null) {
 		if(found.Assigned) {
