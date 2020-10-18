@@ -50,11 +50,14 @@ function UpdateJobs()
 		{
 			for(let jdx = 0; jdx < Memory.ConstructionJobs.length; jdx++)
 			{
-				if(Memory.ConstructionJobs[jdx].ConstructionSiteId == builders[idx].memory.job.ConstructionSiteId)
+				if(builders[idx].memory.job != undefined)
 				{
-					console.log("[ArchitectArbiter]: Job Completed: " + builders[idx].name + " - " + builders[idx].memory.job.Id);
-					delete builders[idx].memory.job;
-					Memory.ConstructionJobs.splice(jdx, 1);
+					if(Memory.ConstructionJobs[jdx].ConstructionSiteId == builders[idx].memory.job.ConstructionSiteId)
+					{
+						console.log("[ArchitectArbiter]: Job Completed: " + builders[idx].name + " - " + builders[idx].memory.job.Id);
+						delete builders[idx].memory.job;
+						Memory.ConstructionJobs.splice(jdx, 1);
+					}
 				}
 			}
 		}
