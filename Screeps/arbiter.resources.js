@@ -40,6 +40,9 @@ module.exports.Initialise = function()
 	}
 
 	Memory.ResourceJobs = [];
+	Memory.EfficiencyRA = 0;
+	Memory.EnergyPerTick = 0;
+	Memory.RenderStats = true;
 
 	const resources = Game.spawns["Spawn1"].room.find(FIND_SOURCES);
 	for(var idx = 0; idx < resources.length; idx++)
@@ -56,10 +59,25 @@ module.exports.Initialise = function()
 	Memory.ResourceArbiterInitialised = true;
 }
 
+module.exports.AssignCreepToJob = function(_creep)
+{
+	for(let idx = 0; idx < Memory.ResourceJobs.length; idx++)
+	{
+		if(!Memory.ResourceJobs[idx].Assigned)
+		{
+			_creep.memory.job = Memory.ResourceJobs[idx];
+			Memory.ResourceJobs[idx].Assigned = true;
+			console.log("Resource Job assigned: "+_creep.name+" "+_creep.memory.job.Id);
+			return;
+		}
+	}
+}
+
 module.exports.Update = function()
 {
 	UpdateJobs();
 	UpdateHarvesters();
+	RenderStats();
 }
 
 function UpdateJobs()
@@ -110,16 +128,36 @@ function UpdateHarvesters()
 	}
 }
 
-module.exports.AssignCreepToJob = function(_creep)
+function UpdateStats()
 {
-	for(let idx = 0; idx < Memory.ResourceJobs.length; idx++)
+	// Energy Per Tick
+	// var ept = 0;
+	// var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
+	// for(var idx = 0; idx < harvesters.length; idx++)
+	// {
+	// 	var harvester = harvesters[idx];
+	// 	if(harvester.memory.job != null)
+	// 	{
+	// 		let objTarget = Game.getObjectById(harvester.memory.job.ResourceId);
+	// 		let objSource = Game.getObjectById(harvester.memory.job.DeliveryPoint);
+	// 		let targetNode = {
+	// 			pos: objTarget.pos,
+	// 			range: 1,
+	// 		};
+	//
+	// 		let path = Utilities.PathEndToEnd(objSource, targetNode);
+	// 		let workParts = Utilities.GetNumOfParts(harvester.body, WORK);
+	// 		let moveParts = Utilities.GetNumOfParts(harvester.body, MOVE);
+	// 	}
+	// }
+}
+
+function RenderStats()
+{
+	if(Memory.RenderStats)
 	{
-		if(!Memory.ResourceJobs[idx].Assigned)
-		{
-			_creep.memory.job = Memory.ResourceJobs[idx];
-			Memory.ResourceJobs[idx].Assigned = true;
-			console.log("Resource Job assigned: "+_creep.name+" "+_creep.memory.job.Id);
-			return;
-		}
+		new RoomVisual(Game.spawns["Spawn1"].room.name)
+			.text("Efficiency: "+Memory.EfficiencyRA, 4, 2, {color:'white', font:0.8})
+			.text("Energy Per Tick: "+Memory.EnergyPerTick, 5, 3, {color:'white', font:0.8});
 	}
 }
