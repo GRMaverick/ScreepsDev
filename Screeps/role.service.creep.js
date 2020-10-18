@@ -29,7 +29,7 @@ function CalculateCost(_body) {
                 break;
             case TOUGH:
                 cost = cost + 10;
-                break
+                break;
         }
     }
     return cost;
