@@ -43,7 +43,6 @@ function ClearDead()
     {
         if(!Game.creeps[name])
         {
-			harvester.memory.job
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
