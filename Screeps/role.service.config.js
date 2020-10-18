@@ -35,7 +35,7 @@ module.exports.Builder = {
 };
 
 module.exports.Harvester = {
-	SmallMax: 11,
+	SmallMax: 5,
     BigMax: 0,
     Role: "Harvester",
     SmallBody: [
