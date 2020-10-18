@@ -41,6 +41,7 @@ module.exports.Build = function(_creep, _data)
 	}
 	else if(result != OK)
 	{
+		debugger;
 		HandleError("Build", result);
 		return false;
 	}
@@ -48,7 +49,9 @@ module.exports.Build = function(_creep, _data)
 
 module.exports.Deliver = function(_creep, _data)
 {
-	let target = Game.getObjectById(_data.targetId);
+	let jobData = _creep.memory.job;
+
+	let target = Game.getObjectById(jobData.DeliveryPoint);
 	let result = _creep.transfer(target, RESOURCE_ENERGY);
 	if(result == ERR_NOT_IN_RANGE)
 	{
@@ -63,14 +66,16 @@ module.exports.Deliver = function(_creep, _data)
 	}
 };
 
-module.exports.Harvest = function(_creep, _data)
+module.exports.Harvest = function(_creep)
 {
-	let target = Game.getObjectById(_data.targetId);
+	let jobData = _creep.memory.job;
+
+	let target = Game.getObjectById(jobData.ResourceId);
 	let result = _creep.harvest(target);
 	if(result == ERR_NOT_IN_RANGE)
 	{
-		_creep.moveTo(target);
-		//creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+		_creep.moveTo(jobData.AccessPoint.x, jobData.AccessPoint.y);
+		//creep.moveTo(jobData.AccessPoint.x, jobData.AccessPoint.y, {visualizePathStyle: {stroke: '#ffffff'}});
 		return true;
 	}
 	else if(result != OK)

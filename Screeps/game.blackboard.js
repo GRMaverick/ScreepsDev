@@ -1,3 +1,8 @@
+var ResourceArbiter = require('arbiter.resources');
+
+var ServiceCreep = require('role.service.creep');
+var ServiceCreepConfig = require('role.service.config');
+
 function RoadEndToEnd(_startNode, _endNode)
 {
 	let result = PathFinder.search(
@@ -74,30 +79,55 @@ function RoadEndToEnd(_startNode, _endNode)
 
 module.exports.Initialise = function()
 {
-	if(Memory.RoadNetworkBuilt === true)
+	ResourceArbiter.Initialise();
+	ResourceArbiter.OnJobPosted(function(_job)
 	{
-		return true;
-	}
+		console.log("Job Posted: "+_job.Id);
+	});
 
-    let goals = _.map(Game.spawns["Spawn1"].room.find(FIND_SOURCES), function(source)
-	{
-      return { pos: source.pos, range: 1 };
-    });
-	var controllerNode = {
-		pos: Game.spawns["Spawn1"].room.controller.pos,
-		range: 1,
-	};
+    // let goals = _.map(Game.spawns["Spawn1"].room.find(FIND_SOURCES), function(source)
+	// {
+    //   return { pos: source.pos, range: 1 };
+    // });
+	// var controllerNode = {
+	// 	pos: Game.spawns["Spawn1"].room.controller.pos,
+	// 	range: 1,
+	// };
 
-	RoadEndToEnd(Game.spawns["Spawn1"], goals[0]);
-	RoadEndToEnd(Game.spawns["Spawn1"], goals[1]);
-	RoadEndToEnd(Game.spawns["Spawn1"], controllerNode);
-	RoadEndToEnd(Game.spawns["Spawn1"].room.controller, goals[0]);
-
-	Memory.RoadNetworkBuilt = true;
 	return true;
 };
 
 module.exports.Update = function()
 {
+	SpawnCreeps();
 
+	ResourceArbiter.Update();
+
+	var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
+	for(let idx = 0; idx < harvesters.length; idx++)
+	{
+		let harvester = harvesters[idx];
+		if(harvester.memory.job == null)
+		{
+			ResourceArbiter.AssignCreepToJob(harvester);
+		}
+	}
 };
+
+function SpawnCreeps()
+{
+	if(ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1") === true)
+	{
+		return;
+	}
+
+	// if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
+	// {
+	// 	return;
+	// }
+	//
+	// if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true)
+	// {
+	// 	return;
+	// }
+}

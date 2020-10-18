@@ -11,7 +11,7 @@ module.exports.PRIORITY_UPGRADE 	= PRIORITY_UPGRADE;
 module.exports.PRIORITY_DELIVER 	= PRIORITY_DELIVER;
 
 module.exports.Builder = {
-	SmallMax: 2,
+	SmallMax: 0,
     BigMax: 0,
     Role: "Builder",
     SmallBody: [
@@ -30,14 +30,13 @@ module.exports.Builder = {
 	Priorities: [
 		PRIORITY_BUILD,
 		PRIORITY_HARVEST,
-		//PRIORITY_REPAIR,
 		PRIORITY_UPGRADE
 	]
 };
 
 module.exports.Harvester = {
-	SmallMax: 2,
-    BigMax: 1,
+	SmallMax: 11,
+    BigMax: 0,
     Role: "Harvester",
     SmallBody: [
 		WORK,
@@ -60,7 +59,7 @@ module.exports.Harvester = {
 };
 
 module.exports.Upgrader = {
-	SmallMax: 3,
+	SmallMax: 0,
     BigMax: 0,
     Role: "Upgrader",
     SmallBody: [

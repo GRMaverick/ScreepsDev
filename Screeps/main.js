@@ -1,4 +1,3 @@
-var ServiceCreepConfig = require('role.service.config');
 var ServiceCreep = require('role.service.creep');
 
 var Blackboard = require('game.blackboard');
@@ -18,23 +17,6 @@ function ClearDead()
     }
 }
 
-function SpawnCreeps()
-{
-	if(ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1") === true)
-	{
-		return;
-	}
-
-	if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
-	{
-		return;
-	}
-
-	if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true)
-	{
-		return;
-	}
-}
 
 function UpdateCreeps()
 {
@@ -53,14 +35,12 @@ module.exports.loop = function ()
 {
 	profiler.wrap(function()
 	{
-		//console.log("Ryan");
 		Blackboard.Initialise();
+		Blackboard.Update();
 
 		ClearDead();
 
 		//SpawnCreeps();
-		UpdateCreeps();
-
-		//stateMachine.Update();
+		//UpdateCreeps();
 	});
 }
