@@ -65,7 +65,7 @@ function UpdateConstructionJobs() {
 			var closestResourceId = site.pos.findClosestByPath(FIND_SOURCES).id;
 			var job = {
 				Id: "ConstructionSite_"+site.id,
-				Type: "Construction",
+				Type: "Builder",
 				Assigned: false,
 				Assignee: null,
 				ConstructionSiteId: site.id,
@@ -111,7 +111,7 @@ function UpdateRepairJobs()
 			var closestResourceId = structure.pos.findClosestByPath(FIND_SOURCES).id;
 			var job = {
 				Id: "Repair_"+structure.id,
-				Type: "Repair",
+				Type: "Repairer",
 				Assigned: false,
 				Assignee: null,
 				StructureId: structure.id,

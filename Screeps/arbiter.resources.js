@@ -82,7 +82,7 @@ function UpdateJobs()
 			{
 				var job = {
 					Id:resourcePoint.ResourceId+"_"+jdx,
-					Type:"Harvest",
+					Type:"Harvester",
 					ResourceId: resourcePoint.ResourceId,
 					AccessPoint: accessPoint,
 					DeliveryPoint: Game.spawns["Spawn1"].id,

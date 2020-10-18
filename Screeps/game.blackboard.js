@@ -21,16 +21,16 @@ function RoadEndToEnd(_startNode, _endNode) {
 function ClearDead() {
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
-			if(Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Harvest") {
+			if(Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Harvester") {
 				ResourceArbiter.NotifyDeath(name);
 			}
-			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Upgrade") {
+			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Upgrader") {
 				ControllerArbiter.NotifyDeath(name);
 			}
-			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Construction") {
+			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Builder") {
 				ArchitectArbiter.NotifyDeath(name);
 			}
-			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Repair") {
+			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Repairer") {
 				ArchitectArbiter.NotifyDeath(name);
 			}
 
@@ -48,24 +48,27 @@ module.exports.Initialise = function() {
 	Memory.JobBoard = [];
 
 	ResourceArbiter.Initialise();
-	ResourceArbiter.OnJobCreated(function(_jobId, _jobType)
-	{
-		console.log(_jobType + "job posted: " + _jobId);
-		Memory.JobBoard.push({JobId:_jobId, JobType:_jobType});
+	ResourceArbiter.OnJobCreated(function(_jobId, _jobType) {
+		console.log(_jobType + " job posted: " + _jobId);
+		Memory.JobBoard.push({
+			JobId:_jobId, JobType:_jobType
+		});
 	});
 
 	ArchitectArbiter.Initialise();
-	ArchitectArbiter.OnJobCreated(function(_jobId, _jobType)
-	{
-		console.log(_jobType + "job posted: " + _jobId);
-		Memory.JobBoard.push({JobId:_jobId, JobType:_jobType});
+	ArchitectArbiter.OnJobCreated(function(_jobId, _jobType) {
+		console.log(_jobType + " job posted: " + _jobId);
+		Memory.JobBoard.push({
+			JobId:_jobId, JobType:_jobType
+		});
 	});
 
 	ControllerArbiter.Initialise();
-	ControllerArbiter.OnJobCreated(function(_jobId, _jobType)
-	{
-		console.log(_jobType + "job posted: " + _jobId);
-		Memory.JobBoard.push({JobId:_jobId, JobType:_jobType});
+	ControllerArbiter.OnJobCreated(function(_jobId, _jobType) {
+		console.log(_jobType + " job posted: " + _jobId);
+		Memory.JobBoard.push({
+			JobId:_jobId, JobType:_jobType
+		});
 	});
 
 	Memory.BlackboardInitialised = true;
@@ -110,12 +113,25 @@ module.exports.Update = function()
 
 function DistributeJobs()
 {
-	let unemployed = _.filter(Game.creeps).find(element => (element.memory.job == null || element.memory.job == undefined));
-	console.log(unemployed.length + "un-employed creeps");
-	for(let idx = 0; idx < unemployed.length; idx++)
-	{
-		console.log(unemployed[idx].name + "Has no job");
-	}
+	for(var name in Game.creeps) {
+        var creep = Game.creeps[name];
+		if(creep.memory.job != null && creep.memory.job != undefined) {
+			continue;
+		}
+
+		debugger;
+		
+		let role = creep.memory.role;
+		let compatibleJob = Memory.JobBoard.find(element => element.Type == role);
+
+		if(compatibleJob == null || compatibleJob == undefined){
+			continue;
+		}
+
+		debugger;
+
+		console.log(name + " is unemployed!");
+    }
 }
 
 function SpawnCreeps() {

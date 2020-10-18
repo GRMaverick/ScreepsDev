@@ -37,7 +37,7 @@ module.exports.Update = function()
 		if(found == null) {
 			var job = {
 				Id:"Upgrade"+"_"+idx,
-				Type:"Upgrade",
+				Type:"Upgrader",
 				Assigned: false,
 				ResourceId: closestResourceId,
 				ControllerId: Game.spawns["Spawn1"].room.controller.id,
