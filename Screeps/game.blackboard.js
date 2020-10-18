@@ -80,6 +80,7 @@ module.exports.Update = function()
 	ControllerArbiter.Update();
 	ArchitectArbiter.Update();
 
+	DistributeJobs();
 	// var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
 	// for(let idx = 0; idx < harvesters.length; idx++) {
 	// 	let harvester = harvesters[idx];
