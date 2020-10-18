@@ -2,13 +2,10 @@ var Services = require('role.service.actions');
 var ServiceCreepConfig = require('role.service.config');
 var Utilities = require('utilities');
 
-function CalculateCost(_body)
-{
+function CalculateCost(_body) {
     var cost = 0;
-    for(var i in _body)
-    {
-        switch(_body[i])
-        {
+    for(var i in _body) {
+        switch(_body[i]) {
             case MOVE:
                 cost = cost + 50;
                 break;
@@ -38,53 +35,43 @@ function CalculateCost(_body)
     return cost;
 }
 
-function GetBestBodyParts(_energy)
-{
+function GetBestBodyParts(_energy) {
 	let totalParts = Math.floor(_energy / CalculateCost([WORK, MOVE, CARRY]));
 	var body = [];
-	for(let i = 0; i < totalParts; i++)
-	{
+	for(let i = 0; i < totalParts; i++) {
 		body.push(WORK);
 	}
-	for(let i = 0; i < totalParts; i++)
-	{
+	for(let i = 0; i < totalParts; i++) {
 		body.push(CARRY);
 	}
-	for(let i = 0; i < totalParts; i++)
-	{
+	for(let i = 0; i < totalParts; i++) {
 		body.push(MOVE);
 	}
 	return body;
 }
 
-module.exports.Create = function(_config, _spawn)
-{
+module.exports.Create = function(_config, _spawn) {
 	if( Game.spawns[_spawn].spawning )
         return true;
 
 	let maxEnergyAvailable = Game.spawns[_spawn].store.getCapacity(RESOURCE_ENERGY);
 	var creepCount = _.sum( Game.creeps, { memory: { role: _config.Role } } );
-	if(creepCount < _config.Min)
-	{
+	if(creepCount < _config.Min) {
 		// Attempt Biggest boy
 	    let name = _config.Role+Game.time;
 		let targetBody = GetBestBodyParts(maxEnergyAvailable);
 		let error = Game.spawns[_spawn].spawnCreep(targetBody, name);
-		if(error == OK)
-		{
+		if(error == OK) {
 			Game.creeps[name].memory = { role:_config.Role };
 		    console.log("Spawning: " + name + " - Cost: " + CalculateCost(targetBody) + " - Body: " + targetBody.toString());
 			return true;
 		}
-		else if(error == ERR_NOT_ENOUGH_ENERGY)
-		{
+		else if(error == ERR_NOT_ENOUGH_ENERGY) {
 			// Attempt Default boy on Harvester role
-			if(_config.Role == "Harvester")
-			{
+			if(_config.Role == "Harvester") {
 				let energyAvailable = Game.spawns[_spawn].store.getUsedCapacity();
 				let defaultCost = CalculateCost(_config.DefaultBody);
-				if(energyAvailable > defaultCost)
-				{
+				if(energyAvailable > defaultCost) {
 					Game.spawns[_spawn].spawnCreep(_config.DefaultBody, name);
 				    Game.creeps[name].memory = { role:_config.Role };
 				    console.log("Spawning: " + name + " - Cost: " + defaultCost + " - Body: " + _config.DefaultBody.toString());
@@ -92,8 +79,7 @@ module.exports.Create = function(_config, _spawn)
 				}
 			}
 		}
-		else
-		{
+		else {
 			Utilities.LogError("[Spawn]", error);
 		}
 	}
@@ -101,15 +87,12 @@ module.exports.Create = function(_config, _spawn)
 	return false;
 };
 
-module.exports.Update = function(_creep)
-{
-	if(_creep.spawning || !_creep.memory.job)
-	{
+module.exports.Update = function(_creep) {
+	if(_creep.spawning || !_creep.memory.job) {
 		return;
 	}
 
-	if(_creep.memory.job.Type == "Construction")
-	{
+	if(_creep.memory.job.Type == "Construction") {
 		if(_creep.memory.building && _creep.store[RESOURCE_ENERGY] == 0) {
 			_creep.memory.building = false;
 			_creep.say('🔄 harvest');
@@ -119,28 +102,22 @@ module.exports.Update = function(_creep)
 			_creep.say('⚡ upgrade');
 		}
 
-		if(_creep.memory.building)
-		{
+		if(_creep.memory.building) {
 			Services.Build(_creep);
 		}
-		else
-		{
+		else {
 			Services.Harvest(_creep);
 		}
 	}
-	else if (_creep.memory.job.Type == "Harvest")
-	{
-		if(_creep.store.getFreeCapacity() == 0)
-		{
+	else if (_creep.memory.job.Type == "Harvest") {
+		if(_creep.store.getFreeCapacity() == 0) {
 			Services.Deliver(_creep);
 		}
-		else
-		{
+		else {
 			Services.Harvest(_creep);
 		}
 	}
-	else if (_creep.memory.job.Type == "Upgrade")
-	{
+	else if (_creep.memory.job.Type == "Upgrade") {
 		if(_creep.memory.upgrading && _creep.store[RESOURCE_ENERGY] == 0) {
 			_creep.memory.upgrading = false;
 			_creep.say('🔄 harvest');
@@ -150,17 +127,14 @@ module.exports.Update = function(_creep)
 			_creep.say('⚡ upgrade');
 		}
 
-		if(_creep.memory.upgrading)
-		{
+		if(_creep.memory.upgrading) {
 			Services.Upgrade(_creep);
 		}
-		else
-		{
+		else {
 			Services.Harvest(_creep);
 		}
 	}
-	else if (_creep.memory.job.Type == "Repair")
-	{
+	else if (_creep.memory.job.Type == "Repair") {
 		if(_creep.memory.repairing && _creep.store[RESOURCE_ENERGY] == 0) {
 			_creep.memory.repairing = false;
 			_creep.say('🔄 harvest');
@@ -170,12 +144,10 @@ module.exports.Update = function(_creep)
 			_creep.say('⚡ repair');
 		}
 
-		if(_creep.memory.repairing)
-		{
+		if(_creep.memory.repairing) {
 			Services.Repair(_creep);
 		}
-		else
-		{
+		else {}
 			Services.Harvest(_creep);
 		}
 	}

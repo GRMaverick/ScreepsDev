@@ -1,25 +1,20 @@
 var Services = require('role.service.actions');
 
-module.exports.NotifyDeath = function(_creepName)
-{
+module.exports.NotifyDeath = function(_creepName) {
 	let found = Memory.ControllerJobs.find(element => element.Assignee == _creepName);
-	if(found != null)
-	{
+	if(found != null) {
 		found.Assigned = false;
 		found.Assignee = null;
 	}
 }
 
-module.exports.Initialise = function()
-{
+module.exports.Initialise = function() {
 	Memory.ControllerJobs = [];
 
 	var closestResourceId = Game.spawns["Spawn1"].room.controller.pos.findClosestByPath(FIND_SOURCES).id;
-	for(let idx = 0; idx < 3; idx++)
-	{
+	for(let idx = 0; idx < 3; idx++) {
 		let found = Memory.ControllerJobs.find(element => element.Id == "Upgrade"+"_"+idx);
-		if(found == null)
-		{
+		if(found == null) {
 			var job = {
 				Id:"Upgrade"+"_"+idx,
 				Type:"Upgrade",
@@ -33,11 +28,9 @@ module.exports.Initialise = function()
 	}
 }
 
-module.exports.AssignCreepToJob = function(_creep)
-{
+module.exports.AssignCreepToJob = function(_creep) {
 	let found = Memory.ControllerJobs.find(element => element.Assigned == false);
-	if(found != null)
-	{
+	if(found != null) {
 		found.Assigned = true;
 		found.Assignee = _creep.name;
 		_creep.memory.job = found;
@@ -48,34 +41,4 @@ module.exports.AssignCreepToJob = function(_creep)
 
 module.exports.Update = function()
 {
-	//UpdateUpgraders();
-}
-
-function UpdateUpgraders()
-{
-	var upgraders = _.filter(Game.creeps, { memory: { role:"Upgrader"} });
-	for(let idx = 0; idx < upgraders.length; idx++)
-	{
-		var upgrader = upgraders[idx];
-		if(upgrader.memory.job != null && upgrader.memory.job.Type == "Upgrade" && !upgrader.spawning)
-		{
-			if(upgrader.memory.upgrading && upgrader.store[RESOURCE_ENERGY] == 0) {
-				upgrader.memory.upgrading = false;
-				upgrader.say('🔄 harvest');
-			}
-			if(!upgrader.memory.upgrading && upgrader.store.getFreeCapacity() == 0) {
-				upgrader.memory.upgrading = true;
-				upgrader.say('⚡ upgrade');
-			}
-
-			if(upgrader.memory.upgrading)
-			{
-				Services.Upgrade(upgrader);
-			}
-			else
-			{
-				Services.Harvest(upgrader);
-			}
-		}
-	}
 }

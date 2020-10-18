@@ -2,8 +2,7 @@ var aResourcePoints = [];
 
 var Services = require('role.service.actions');
 
-function GetAccessPoints(_resource)
-{
+function GetAccessPoints(_resource) {
 	var position = _resource.pos;
 	const found = _resource.room.lookForAtArea(LOOK_TERRAIN,
 		position.y-1, position.x-1,
@@ -12,12 +11,9 @@ function GetAccessPoints(_resource)
 	);
 
 	var aps = [];
-	for(var idx = 0; idx < found.length; idx++)
-	{
-		if(found[idx].type == "terrain" &&
-			(found[idx].terrain == "plain" ||
-			found[idx].terrain == "swamp"))
-		{
+	for(var idx = 0; idx < found.length; idx++) {
+		if(found[idx].type == "terrain" && (found[idx].terrain == "plain" ||
+			found[idx].terrain == "swamp")) {
 			aps.push({x:found[idx].x, y:found[idx].y});
 		}
 	}
@@ -25,25 +21,21 @@ function GetAccessPoints(_resource)
 	return aps;
 }
 
-module.exports.NotifyDeath = function(_creepName)
-{
+module.exports.NotifyDeath = function(_creepName) {
 	let found = Memory.ResourceJobs.find(element => element.Assignee == _creepName);
-	if(found != null)
-	{
+	if(found != null) {
 		found.Assigned = false;
 		found.Assignee = null;
 	}
 }
 
-module.exports.Initialise = function()
-{
+module.exports.Initialise = function() {
 	Memory.ResourceJobs = [];
 	Memory.EfficiencyRA = 0;
 	Memory.EnergyPerTick = 0;
 
 	const resources = Game.spawns["Spawn1"].room.find(FIND_SOURCES);
-	for(var idx = 0; idx < resources.length; idx++)
-	{
+	for(var idx = 0; idx < resources.length; idx++) {
 		var ap = GetAccessPoints(resources[idx]);
 		var oResourcePoint = {
 			AccessPoints: ap,
@@ -54,11 +46,9 @@ module.exports.Initialise = function()
 	}
 }
 
-module.exports.AssignCreepToJob = function(_creep)
-{
+module.exports.AssignCreepToJob = function(_creep) {
 	let found = Memory.ResourceJobs.find(element => element.Assigned == false);
-	if(found != null)
-	{
+	if(found != null) {
 		found.Assigned = true;
 		found.Assignee = _creep.name;
 		_creep.memory.job = found;
@@ -70,8 +60,6 @@ module.exports.AssignCreepToJob = function(_creep)
 module.exports.Update = function()
 {
 	UpdateJobs();
-	//UpdateHarvesters();
-	RenderStats();
 }
 
 function UpdateJobs()
@@ -100,59 +88,5 @@ function UpdateJobs()
 				console.log("[ResourceArbiter]: Job Posted: "+job.Id);
 			}
 		}
-	}
-}
-
-function UpdateHarvesters()
-{
-	var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
-	for(var idx = 0; idx < harvesters.length; idx++)
-	{
-		var harvester = harvesters[idx];
-		if(harvester.memory.job != null && harvester.memory.job.Type == "Harvest" && !harvester.spawning)
-		{
-			if(harvester.store.getFreeCapacity() == 0)
-			{
-				Services.Deliver(harvester);
-			}
-			else
-			{
-				Services.Harvest(harvester);
-			}
-		}
-	}
-}
-
-function UpdateStats()
-{
-	// Energy Per Tick
-	// var ept = 0;
-	// var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
-	// for(var idx = 0; idx < harvesters.length; idx++)
-	// {
-	// 	var harvester = harvesters[idx];
-	// 	if(harvester.memory.job != null)
-	// 	{
-	// 		let objTarget = Game.getObjectById(harvester.memory.job.ResourceId);
-	// 		let objSource = Game.getObjectById(harvester.memory.job.DeliveryPoint);
-	// 		let targetNode = {
-	// 			pos: objTarget.pos,
-	// 			range: 1,
-	// 		};
-	//
-	// 		let path = Utilities.PathEndToEnd(objSource, targetNode);
-	// 		let workParts = Utilities.GetNumOfParts(harvester.body, WORK);
-	// 		let moveParts = Utilities.GetNumOfParts(harvester.body, MOVE);
-	// 	}
-	// }
-}
-
-function RenderStats()
-{
-	if(Memory.RenderStats)
-	{
-		new RoomVisual(Game.spawns["Spawn1"].room.name)
-			.text("Efficiency: "+Memory.EfficiencyRA, 4, 2, {color:'white', font:0.8})
-			.text("Energy Per Tick: "+Memory.EnergyPerTick, 5, 3, {color:'white', font:0.8});
 	}
 }
