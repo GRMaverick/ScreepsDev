@@ -92,7 +92,7 @@ module.exports.Update = function(_creep) {
 		return;
 	}
 
-	if(_creep.memory.job.Type == "Construction") {
+	if(_creep.memory.job.Type == "Builder") {
 		if(_creep.memory.building && _creep.store[RESOURCE_ENERGY] == 0) {
 			_creep.memory.building = false;
 			_creep.say('🔄 harvest');
@@ -109,7 +109,7 @@ module.exports.Update = function(_creep) {
 			Services.Harvest(_creep);
 		}
 	}
-	else if (_creep.memory.job.Type == "Harvest") {
+	else if (_creep.memory.job.Type == "Harvester") {
 		if(_creep.store.getFreeCapacity() == 0) {
 			Services.Deliver(_creep);
 		}
@@ -117,7 +117,7 @@ module.exports.Update = function(_creep) {
 			Services.Harvest(_creep);
 		}
 	}
-	else if (_creep.memory.job.Type == "Upgrade") {
+	else if (_creep.memory.job.Type == "Upgrader") {
 		if(_creep.memory.upgrading && _creep.store[RESOURCE_ENERGY] == 0) {
 			_creep.memory.upgrading = false;
 			_creep.say('🔄 harvest');
@@ -134,7 +134,7 @@ module.exports.Update = function(_creep) {
 			Services.Harvest(_creep);
 		}
 	}
-	else if (_creep.memory.job.Type == "Repair") {
+	else if (_creep.memory.job.Type == "Repairer") {
 		if(_creep.memory.repairing && _creep.store[RESOURCE_ENERGY] == 0) {
 			_creep.memory.repairing = false;
 			_creep.say('🔄 harvest');
