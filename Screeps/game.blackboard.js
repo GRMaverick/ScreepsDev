@@ -44,13 +44,21 @@ function ClearDead()
     {
         if(!Game.creeps[name])
         {
-			if(Memory.creeps[name].job.Type == "Harvest")
+			if(Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Harvest")
 			{
 				ResourceArbiter.NotifyDeath(name);
 			}
-			else if (Memory.creeps[name].job.Type == "Upgrade")
+			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Upgrade")
 			{
 				ControllerArbiter.NotifyDeath(name);
+			}
+			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Construction")
+			{
+				ArchitectArbiter.NotifyDeath(name);
+			}
+			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Repair")
+			{
+				ArchitectArbiter.NotifyDeath(name);
 			}
 
             delete Memory.creeps[name];
@@ -122,6 +130,8 @@ module.exports.Update = function()
 			ArchitectArbiter.AssignCreepToJob(builder);
 		}
 	}
+
+	UpdateCreeps();
 };
 
 function SpawnCreeps()
@@ -140,4 +150,16 @@ function SpawnCreeps()
 	{
 		return;
 	}
+}
+
+function UpdateCreeps()
+{
+    for(var name in Game.creeps)
+    {
+        var creep = Game.creeps[name];
+		if(creep.spawning === false)
+		{
+			ServiceCreep.Update(creep);
+		}
+    }
 }

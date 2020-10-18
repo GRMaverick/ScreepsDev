@@ -13,6 +13,7 @@ module.exports.NotifyDeath = function(_creepName)
 module.exports.Initialise = function()
 {
 	Memory.ConstructionJobs = [];
+	Memory.RepairJobs = [];
 }
 
 module.exports.AssignCreepToJob = function(_creep)
@@ -30,11 +31,13 @@ module.exports.AssignCreepToJob = function(_creep)
 
 module.exports.Update = function()
 {
-	UpdateJobs();
-	UpdateBuilders();
+	UpdateConstructionJobs();
+	UpdateRepairJobs();
+	//UpdateBuilders();
+	//UpdateRepairers();
 }
 
-function UpdateJobs()
+function UpdateConstructionJobs()
 {
 	let constructionSites = Game.spawns["Spawn1"].room.find(FIND_CONSTRUCTION_SITES);
 	// Clear Completed Jobs
@@ -85,30 +88,113 @@ function UpdateJobs()
 	}
 }
 
+function UpdateRepairJobs()
+{
+	let structures = Game.spawns["Spawn1"].room.find(FIND_STRUCTURES);
+
+	// Clear Completed Jobs
+	var creeps = _.filter(Game.creeps, { memory: { role:"Repairer"} });
+	for(let idx = 0; idx < creeps.length; idx++)
+	{
+		if(creeps[idx].memory.job == undefined)
+		{
+			continue;
+		}
+
+		let found = structures.find(element => element.id == creeps[idx].memory.job.StructureId);
+		if(found == null)
+		{
+			for(let jdx = 0; jdx < Memory.RepairJobs.length; jdx++)
+			{
+				if(creeps[idx].memory.job != undefined)
+				{
+					if(Memory.RepairJobs[jdx].StructureId == creeps[idx].memory.job.StructureId)
+					{
+						console.log("[ArchitectArbiter]: Job Completed: " + creeps[idx].name + " - " + creeps[idx].memory.job.Id);
+						delete creeps[idx].memory.job;
+						Memory.RepairJobs.splice(jdx, 1);
+					}
+				}
+			}
+		}
+	}
+
+	// Add New Jobs
+	const kRepairThreshold = 0.5;
+	for(let idx = 0; idx < structures.length; idx++)
+	{
+		let structure = structures[idx];
+		let found = Memory.RepairJobs.find(element => element.Id == "Repair_"+structure.id);
+		if(found == null && structure.hits <= (structure.hitsMax * kRepairThreshold))
+		{
+			var closestResourceId = structure.pos.findClosestByPath(FIND_SOURCES).id;
+			var job = {
+				Id: "Repair_"+structure.id,
+				Type: "Repair",
+				Assigned: false,
+				Assignee: null,
+				StructureId: structure.id,
+				ResourceId: closestResourceId
+			};
+			Memory.RepairJobs.push(job);
+			console.log("[ArchitectArbiter]: Job Posted: "+job.Id);
+		}
+	}
+}
+
 function UpdateBuilders()
 {
-	var builders = _.filter(Game.creeps, { memory: { role:"Builder"} });
-	for(let idx = 0; idx < builders.length; idx++)
+	var creeps = _.filter(Game.creeps, { memory: { role:"Builder"} });
+	for(let idx = 0; idx < creeps.length; idx++)
 	{
-		var builder = builders[idx];
-		if(builder.memory.job != null && builder.memory.job.Type == "Construction" && !builder.spawning)
+		var creep = creeps[idx];
+		if(creep.memory.job != null && creep.memory.job.Type == "Construction" && !creep.spawning)
 		{
-			if(builder.memory.building && builder.store[RESOURCE_ENERGY] == 0) {
-				builder.memory.building = false;
-				builder.say('🔄 harvest');
+			if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
+				creep.memory.building = false;
+				creep.say('🔄 harvest');
 			}
-			if(!builder.memory.building && builder.store.getFreeCapacity() == 0) {
-				builder.memory.building = true;
-				builder.say('⚡ upgrade');
+			if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
+				creep.memory.building = true;
+				creep.say('⚡ upgrade');
 			}
 
-			if(builder.memory.building)
+			if(creep.memory.building)
 			{
-				Services.Build(builder);
+				Services.Build(creep);
 			}
 			else
 			{
-				Services.Harvest(builder);
+				Services.Harvest(creep);
+			}
+		}
+	}
+}
+
+function UpdateRepairers()
+{
+	var creeps = _.filter(Game.creeps, { memory: { role:"Repairer"} });
+	for(let idx = 0; idx < creeps.length; idx++)
+	{
+		var creep = creeps[idx];
+		if(creep.memory.job != null && creep.memory.job.Type == "Repair" && !creep.spawning)
+		{
+			if(creep.memory.repairing && creep.store[RESOURCE_ENERGY] == 0) {
+				creep.memory.repairing = false;
+				creep.say('🔄 harvest');
+			}
+			if(!creep.memory.repairing && creep.store.getFreeCapacity() == 0) {
+				creep.memory.repairing = true;
+				creep.say('⚡ repair');
+			}
+
+			if(creep.memory.repairing)
+			{
+				Services.Repair(creep);
+			}
+			else
+			{
+				Services.Harvest(creep);
 			}
 		}
 	}

@@ -103,196 +103,80 @@ module.exports.Create = function(_config, _spawn)
 
 module.exports.Update = function(_creep)
 {
-	return;
-
-	let task = 0;
-	if(_creep.memory.tasks.length > 0)
+	if(creep.spawning || !creep.memory.job)
 	{
-		task = _creep.memory.tasks[_creep.memory.tasks.length-1];
-	}
-
-	// Pop Task
-	switch(task.id)
-	{
-		case ServiceCreepConfig.PRIORITY_BUILD:
-		{
-			let targets = _creep.room.find(FIND_CONSTRUCTION_SITES);
-			let target = targets.find(element => element.id == task.data.targetId);
-			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0 || target === "undefined")
-			{
-				delete _creep.memory.tasks[_creep.memory.tasks.length];
-				_creep.memory.tasks.pop();
-			}
-			break;
-		}
-		case ServiceCreepConfig.PRIORITY_HARVEST:
-			if(_creep.store.getFreeCapacity() == 0)
-			{
-				delete _creep.memory.tasks[_creep.memory.tasks.length];
-				_creep.memory.tasks.pop();
-			}
-			break;
-		case ServiceCreepConfig.PRIORITY_REPAIR:
-			break;
-		case ServiceCreepConfig.PRIORITY_UPGRADE:
-			if(_creep.store.getUsedCapacity() == 0)
-			{
-				delete _creep.memory.tasks[_creep.memory.tasks.length];
-				_creep.memory.tasks.pop();
-			}
-			break;
-		case ServiceCreepConfig.PRIORITY_DELIVER:
-		{
-			let targets = _creep.room.find(FIND_STRUCTURES, {
-				filter: (structure) => {
-					return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
-					   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-				}
-			});
-
-			if(_creep.store.getUsedCapacity() == 0 || targets.length == 0)
-			{
-				delete _creep.memory.tasks[_creep.memory.tasks.length];
-				_creep.memory.tasks.pop();
-			}
-			break;
-		}
-	}
-
-	// Push Task
-	let bTaskAdded = false;
-	for(var prioIdx = 0; prioIdx < _creep.memory.priorities.length; prioIdx++)
-	{
-		switch(_creep.memory.priorities[prioIdx])
-		{
-			case ServiceCreepConfig.PRIORITY_BUILD:
-			{
-				let targets = _creep.room.find(FIND_CONSTRUCTION_SITES);
-				if(task.id != ServiceCreepConfig.PRIORITY_BUILD && _creep.store.getFreeCapacity() == 0 && targets.length != 0)
-				{
-					var taskdata = {
-						id: ServiceCreepConfig.PRIORITY_BUILD,
-						data: {
-							targetId: targets[0].id
-						}
-					};
-
-					bTaskAdded = true;
-					_creep.say("Building");
-					_creep.memory.tasks.push(taskdata);
-				}
-				break;
-			}
-			case ServiceCreepConfig.PRIORITY_HARVEST:
-			{
-				let targets = _creep.room.find(FIND_SOURCES);
-				if(task.id != ServiceCreepConfig.PRIORITY_HARVEST && _creep.store.getUsedCapacity() == 0 && targets.length != 0)
-				{
-					var taskdata = {
-						id: ServiceCreepConfig.PRIORITY_HARVEST,
-						data: {
-							targetId: targets[0].id
-						}
-					};
-
-					bTaskAdded = true;
-					_creep.say("Harvesting");
-					_creep.memory.tasks.push(taskdata);
-				}
-				break;
-			}
-			case ServiceCreepConfig.PRIORITY_DELIVER:
-			{
-				let targets = _creep.room.find(FIND_STRUCTURES, {
-					filter: (structure) => {
-						return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
-						   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-					}
-				});
-
-				if(task.id != ServiceCreepConfig.PRIORITY_DELIVER && _creep.store.getFreeCapacity() == 0 && targets.length != 0)
-				{
-					var taskdata = {
-						id: ServiceCreepConfig.PRIORITY_DELIVER,
-						data: {
-							targetId: targets[0].id
-						}
-					};
-
-					bTaskAdded = true;
-					_creep.say("Delivering");
-					_creep.memory.tasks.push(taskdata);
-				}
-				break;
-			}
-			case ServiceCreepConfig.PRIORITY_UPGRADE:
-			{
-				let targets = [];
-				if(_creep.memory.role != 'Upgrader')
-				{
-					targets = _creep.room.find(FIND_STRUCTURES, {
-						filter: (structure) => {
-							return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) &&
-							   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-						}
-					});
-				}
-
-				if(task.id != ServiceCreepConfig.PRIORITY_UPGRADE && _creep.store.getFreeCapacity() == 0 && targets.length == 0)
-				{
-					var taskdata = {
-						id: ServiceCreepConfig.PRIORITY_UPGRADE,
-						data: {
-							targetId: _creep.room.controller.id
-						}
-					};
-
-					bTaskAdded = true;
-					_creep.say("Upgrading");
-					_creep.memory.tasks.push(taskdata);
-				}
-				break;
-			}
-			case ServiceCreepConfig.PRIORITY_REPAIR:
-			{
-				break;
-			}
-		}
-
-		if(bTaskAdded === true)
-		{
-			break;
-		}
-	}
-
-	// Perform Task
-	if(_creep.memory.tasks.length > 0)
-	{
-		task = _creep.memory.tasks[_creep.memory.tasks.length-1];
-	}
-
-	if(task === "undefined")
-	{
-		_creep.say("No Task Assigned");
 		return;
 	}
 
-	switch(task.id)
+	if(creep.memory.job.Type == "Construction")
 	{
-		case ServiceCreepConfig.PRIORITY_BUILD:
-			Services.Build(_creep, task.data);
-			break;
-		case ServiceCreepConfig.PRIORITY_HARVEST:
-			Services.Harvest(_creep, task.data);
-			break;
-		case ServiceCreepConfig.PRIORITY_REPAIR:
-			Services.Repair(_creep, task.data);
-			break;
-		case ServiceCreepConfig.PRIORITY_UPGRADE:
-	        Services.Upgrade(_creep, task.data);
-			break;
-		case ServiceCreepConfig.PRIORITY_DELIVER:
-			Services.Deliver(_creep, task.data);
-			break;
+		if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
+			creep.memory.building = false;
+			creep.say('🔄 harvest');
+		}
+		if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
+			creep.memory.building = true;
+			creep.say('⚡ upgrade');
+		}
+
+		if(creep.memory.building)
+		{
+			Services.Build(creep);
+		}
+		else
+		{
+			Services.Harvest(creep);
+		}
+	}
+	else if (creep.memory.job.Type == "Harvest")
+	{
+		if(harvester.store.getFreeCapacity() == 0)
+		{
+			Services.Deliver(harvester);
+		}
+		else
+		{
+			Services.Harvest(harvester);
+		}
+	}
+	else if (creep.memory.job.Type == "Upgrade")
+	{
+		if(upgrader.memory.upgrading && upgrader.store[RESOURCE_ENERGY] == 0) {
+			upgrader.memory.upgrading = false;
+			upgrader.say('🔄 harvest');
+		}
+		if(!upgrader.memory.upgrading && upgrader.store.getFreeCapacity() == 0) {
+			upgrader.memory.upgrading = true;
+			upgrader.say('⚡ upgrade');
+		}
+
+		if(upgrader.memory.upgrading)
+		{
+			Services.Upgrade(upgrader);
+		}
+		else
+		{
+			Services.Harvest(upgrader);
+		}
+	}
+	else if (creep.memory.job.Type == "Repair")
+	{
+		if(creep.memory.repairing && creep.store[RESOURCE_ENERGY] == 0) {
+			creep.memory.repairing = false;
+			creep.say('🔄 harvest');
+		}
+		if(!creep.memory.repairing && creep.store.getFreeCapacity() == 0) {
+			creep.memory.repairing = true;
+			creep.say('⚡ repair');
+		}
+
+		if(creep.memory.repairing)
+		{
+			Services.Repair(creep);
+		}
+		else
+		{
+			Services.Harvest(creep);
+		}
 	}
 };

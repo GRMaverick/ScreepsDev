@@ -48,7 +48,7 @@ module.exports.AssignCreepToJob = function(_creep)
 
 module.exports.Update = function()
 {
-	UpdateUpgraders();
+	//UpdateUpgraders();
 }
 
 function UpdateUpgraders()

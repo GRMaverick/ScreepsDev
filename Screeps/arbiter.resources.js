@@ -70,7 +70,7 @@ module.exports.AssignCreepToJob = function(_creep)
 module.exports.Update = function()
 {
 	UpdateJobs();
-	UpdateHarvesters();
+	//UpdateHarvesters();
 	RenderStats();
 }
 
