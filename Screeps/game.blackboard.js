@@ -1,5 +1,6 @@
 var ResourceArbiter = require('arbiter.resources');
 var ControllerArbiter = require('arbiter.controller');
+var ArchitectArbiter = require('arbiter.architect');
 
 var ServiceCreep = require('role.service.creep');
 var ServiceCreepConfig = require('role.service.config');
@@ -67,18 +68,9 @@ module.exports.Initialise = function()
 
 	Memory.RenderStats = true;
 
-	ResourceArbiter.OnJobPosted(function(_job)
-	{
-		console.log("[ResourceArbiter]: Job Posted: "+_job.Id);
-	});
 	ResourceArbiter.Initialise();
-
-	ControllerArbiter.OnJobPosted(function(_job)
-	{
-		console.log("[ControllerArbiter]: Job Posted: "+_job.Id);
-	});
 	ControllerArbiter.Initialise();
-
+	ArchitectArbiter.Initialise();
 
     // let goals = _.map(Game.spawns["Spawn1"].room.find(FIND_SOURCES), function(source)
 	// {
@@ -99,6 +91,7 @@ module.exports.Update = function()
 
 	ResourceArbiter.Update();
 	ControllerArbiter.Update();
+	ArchitectArbiter.Update();
 
 	var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
 	for(let idx = 0; idx < harvesters.length; idx++)
@@ -119,6 +112,16 @@ module.exports.Update = function()
 			ControllerArbiter.AssignCreepToJob(upgrader);
 		}
 	}
+
+	var builders = _.filter(Game.creeps, { memory: { role:"Builder"} });
+	for(let idx = 0; idx < builders.length; idx++)
+	{
+		let builder = builders[idx];
+		if(builder.memory.job == null)
+		{
+			ArchitectArbiter.AssignCreepToJob(builder);
+		}
+	}
 };
 
 function SpawnCreeps()
@@ -133,8 +136,8 @@ function SpawnCreeps()
 		return;
 	}
 
-	// if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
-	// {
-	// 	return;
-	// }
+	if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
+	{
+		return;
+	}
 }

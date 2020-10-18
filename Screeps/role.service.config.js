@@ -11,7 +11,7 @@ module.exports.PRIORITY_UPGRADE 	= PRIORITY_UPGRADE;
 module.exports.PRIORITY_DELIVER 	= PRIORITY_DELIVER;
 
 module.exports.Builder = {
-	Min: 2,
+	Min: 1,
     Role: "Builder",
     DefaultBody: [
 		WORK,

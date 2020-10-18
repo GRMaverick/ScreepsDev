@@ -1,7 +1,5 @@
 var aResourcePoints = [];
 
-var PostJobsCallback = null;
-
 var Services = require('role.service.actions');
 
 function GetAccessPoints(_resource)
@@ -25,11 +23,6 @@ function GetAccessPoints(_resource)
 	}
 
 	return aps;
-}
-
-module.exports.OnJobPosted = function(_callback)
-{
-	PostJobsCallback = _callback;
 }
 
 module.exports.NotifyDeath = function(_creepName)
@@ -69,7 +62,7 @@ module.exports.AssignCreepToJob = function(_creep)
 		found.Assigned = true;
 		found.Assignee = _creep.name;
 		_creep.memory.job = found;
-		console.log("Resource Job assigned: "+found.Assignee+" "+found.Id);
+		console.log("[ResourceArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
 		return;
 	}
 }
@@ -104,7 +97,7 @@ function UpdateJobs()
 				};
 
 				Memory.ResourceJobs.push(job);
-				PostJobsCallback(job);
+				console.log("[ResourceArbiter]: Job Posted: "+job.Id);
 			}
 		}
 	}

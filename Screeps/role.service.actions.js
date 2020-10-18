@@ -1,8 +1,9 @@
 var Utilities = require('utilities');
 
-module.exports.Build = function(_creep, _data)
+module.exports.Build = function(_creep)
 {
-	let target = Game.getObjectById(_data.targetId);
+	let jobData = _creep.memory.job;
+	let target = Game.getObjectById(jobData.ConstructionSiteId);
 	let result = _creep.build(target);
 	if(result == ERR_NOT_IN_RANGE)
 	{
@@ -12,7 +13,6 @@ module.exports.Build = function(_creep, _data)
 	}
 	else if(result != OK)
 	{
-		debugger;
 		Utilities.LogError("[Build]", result);
 		return false;
 	}
@@ -81,7 +81,7 @@ module.exports.Repair = function(_creep, _data)
 	}
 };
 
-module.exports.Upgrade = function(_creep, _data)
+module.exports.Upgrade = function(_creep)
 {
 	let jobData = _creep.memory.job;
 

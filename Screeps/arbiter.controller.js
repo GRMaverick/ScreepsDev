@@ -1,12 +1,5 @@
 var Services = require('role.service.actions');
 
-var PostJobsCallback = null;
-
-module.exports.OnJobPosted = function(_callback)
-{
-	PostJobsCallback = _callback;
-}
-
 module.exports.NotifyDeath = function(_creepName)
 {
 	let found = Memory.ControllerJobs.find(element => element.Assignee == _creepName);
@@ -35,7 +28,7 @@ module.exports.Initialise = function()
 				ControllerId: Game.spawns["Spawn1"].room.controller.id,
 			};
 			Memory.ControllerJobs.push(job);
-			PostJobsCallback(job);
+			console.log("[ControllerArbiter]: Job Posted: "+job.Id);
 		}
 	}
 }
@@ -48,7 +41,7 @@ module.exports.AssignCreepToJob = function(_creep)
 		found.Assigned = true;
 		found.Assignee = _creep.name;
 		_creep.memory.job = found;
-		console.log("Resource Job assigned: "+found.Assignee+" "+found.Id);
+		console.log("[ControllerArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
 		return;
 	}
 }
