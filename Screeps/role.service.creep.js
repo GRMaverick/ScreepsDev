@@ -147,7 +147,7 @@ module.exports.Update = function(_creep) {
 		if(_creep.memory.repairing) {
 			Services.Repair(_creep);
 		}
-		else {}
+		else {
 			Services.Harvest(_creep);
 		}
 	}
