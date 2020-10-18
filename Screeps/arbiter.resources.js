@@ -32,6 +32,16 @@ module.exports.OnJobPosted = function(_callback)
 	PostJobsCallback = _callback;
 }
 
+module.exports.NotifyDeath = function(_creepName)
+{
+	let found = Memory.ResourceJobs.find(element => element.Assignee == _creepName);
+	if(found != null)
+	{
+		found.Assigned = false;
+		found.Assignee = null;
+	}
+}
+
 module.exports.Initialise = function()
 {
 	Memory.ResourceJobs = [];
@@ -53,15 +63,14 @@ module.exports.Initialise = function()
 
 module.exports.AssignCreepToJob = function(_creep)
 {
-	for(let idx = 0; idx < Memory.ResourceJobs.length; idx++)
+	let found = Memory.ResourceJobs.find(element => element.Assigned == false);
+	if(found != null)
 	{
-		if(!Memory.ResourceJobs[idx].Assigned)
-		{
-			_creep.memory.job = Memory.ResourceJobs[idx];
-			Memory.ResourceJobs[idx].Assigned = true;
-			console.log("Resource Job assigned: "+_creep.name+" "+_creep.memory.job.Id);
-			return;
-		}
+		found.Assigned = true;
+		found.Assignee = _creep.name;
+		_creep.memory.job = found;
+		console.log("Resource Job assigned: "+found.Assignee+" "+found.Id);
+		return;
 	}
 }
 
@@ -91,6 +100,7 @@ function UpdateJobs()
 					AccessPoint: accessPoint,
 					DeliveryPoint: Game.spawns["Spawn1"].id,
 					Assigned: false,
+					Assignee: null,
 				};
 
 				Memory.ResourceJobs.push(job);

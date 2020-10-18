@@ -7,6 +7,16 @@ module.exports.OnJobPosted = function(_callback)
 	PostJobsCallback = _callback;
 }
 
+module.exports.NotifyDeath = function(_creepName)
+{
+	let found = Memory.ControllerJobs.find(element => element.Assignee == _creepName);
+	if(found != null)
+	{
+		found.Assigned = false;
+		found.Assignee = null;
+	}
+}
+
 module.exports.Initialise = function()
 {
 	Memory.ControllerJobs = [];
@@ -14,7 +24,7 @@ module.exports.Initialise = function()
 	var closestResourceId = Game.spawns["Spawn1"].room.controller.pos.findClosestByPath(FIND_SOURCES).id;
 	for(let idx = 0; idx < 3; idx++)
 	{
-		let found = Memory.ResourceJobs.find(element => element.Id == "Upgrade"+"_"+idx);
+		let found = Memory.ControllerJobs.find(element => element.Id == "Upgrade"+"_"+idx);
 		if(found == null)
 		{
 			var job = {
@@ -32,15 +42,14 @@ module.exports.Initialise = function()
 
 module.exports.AssignCreepToJob = function(_creep)
 {
-	for(let idx = 0; idx < Memory.ControllerJobs.length; idx++)
+	let found = Memory.ControllerJobs.find(element => element.Assigned == false);
+	if(found != null)
 	{
-		if(!Memory.ControllerJobs[idx].Assigned)
-		{
-			_creep.memory.job = Memory.ControllerJobs[idx];
-			Memory.ControllerJobs[idx].Assigned = true;
-			console.log("Resource Job assigned: "+_creep.name+" "+_creep.memory.job.Id);
-			return;
-		}
+		found.Assigned = true;
+		found.Assignee = _creep.name;
+		_creep.memory.job = found;
+		console.log("Resource Job assigned: "+found.Assignee+" "+found.Id);
+		return;
 	}
 }
 

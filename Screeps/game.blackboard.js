@@ -43,6 +43,15 @@ function ClearDead()
     {
         if(!Game.creeps[name])
         {
+			if(Memory.creeps[name].job.Type == "Harvest")
+			{
+				ResourceArbiter.NotifyDeath(name);
+			}
+			else if (Memory.creeps[name].job.Type == "Upgrade")
+			{
+				ControllerArbiter.NotifyDeath(name);
+			}
+
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
