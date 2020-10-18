@@ -1,4 +1,5 @@
 var ResourceArbiter = require('arbiter.resources');
+var ControllerArbiter = require('arbiter.controller');
 
 var ServiceCreep = require('role.service.creep');
 var ServiceCreepConfig = require('role.service.config');
@@ -36,13 +37,40 @@ function RoadEndToEnd(_startNode, _endNode)
 	}
 }
 
+function ClearDead()
+{
+    for(var name in Memory.creeps)
+    {
+        if(!Game.creeps[name])
+        {
+			harvester.memory.job
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }
+}
+
 module.exports.Initialise = function()
 {
-	ResourceArbiter.Initialise();
+	if(Memory.BlackboardInitialised != null && Memory.BlackboardInitialised == true)
+	{
+		return true;
+	}
+
+	Memory.RenderStats = true;
+
 	ResourceArbiter.OnJobPosted(function(_job)
 	{
-		console.log("Job Posted: "+_job.Id);
+		console.log("[ResourceArbiter]: Job Posted: "+_job.Id);
 	});
+	ResourceArbiter.Initialise();
+
+	ControllerArbiter.OnJobPosted(function(_job)
+	{
+		console.log("[ControllerArbiter]: Job Posted: "+_job.Id);
+	});
+	ControllerArbiter.Initialise();
+
 
     // let goals = _.map(Game.spawns["Spawn1"].room.find(FIND_SOURCES), function(source)
 	// {
@@ -53,14 +81,16 @@ module.exports.Initialise = function()
 	// 	range: 1,
 	// };
 
-	return true;
+	Memory.BlackboardInitialised = true;
 };
 
 module.exports.Update = function()
 {
+	ClearDead();
 	SpawnCreeps();
 
 	ResourceArbiter.Update();
+	ControllerArbiter.Update();
 
 	var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
 	for(let idx = 0; idx < harvesters.length; idx++)
@@ -69,6 +99,16 @@ module.exports.Update = function()
 		if(harvester.memory.job == null)
 		{
 			ResourceArbiter.AssignCreepToJob(harvester);
+		}
+	}
+
+	var upgraders = _.filter(Game.creeps, { memory: { role:"Upgrader"} });
+	for(let idx = 0; idx < upgraders.length; idx++)
+	{
+		let upgrader = upgraders[idx];
+		if(upgrader.memory.job == null)
+		{
+			ControllerArbiter.AssignCreepToJob(upgrader);
 		}
 	}
 };
@@ -80,12 +120,12 @@ function SpawnCreeps()
 		return;
 	}
 
+	if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true)
+	{
+		return;
+	}
+
 	// if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true)
-	// {
-	// 	return;
-	// }
-	//
-	// if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true)
 	// {
 	// 	return;
 	// }

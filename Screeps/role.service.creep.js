@@ -68,6 +68,8 @@ module.exports.Create = function(_config, _spawn)
 
 module.exports.Update = function(_creep)
 {
+	return;
+	
 	let task = 0;
 	if(_creep.memory.tasks.length > 0)
 	{

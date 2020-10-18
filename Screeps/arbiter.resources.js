@@ -34,15 +34,9 @@ module.exports.OnJobPosted = function(_callback)
 
 module.exports.Initialise = function()
 {
-	if(Memory.ResourceArbiterInitialised != null && Memory.ResourceArbiterInitialised == true)
-	{
-		return true;
-	}
-
 	Memory.ResourceJobs = [];
 	Memory.EfficiencyRA = 0;
 	Memory.EnergyPerTick = 0;
-	Memory.RenderStats = true;
 
 	const resources = Game.spawns["Spawn1"].room.find(FIND_SOURCES);
 	for(var idx = 0; idx < resources.length; idx++)
@@ -55,8 +49,6 @@ module.exports.Initialise = function()
 		};
 		aResourcePoints.push(oResourcePoint);
 	}
-
-	Memory.ResourceArbiterInitialised = true;
 }
 
 module.exports.AssignCreepToJob = function(_creep)

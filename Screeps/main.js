@@ -5,19 +5,6 @@ const profiler = require('game.profiler');
 
 //var stateMachine = require('manager.state');
 
-function ClearDead()
-{
-    for(var name in Memory.creeps)
-    {
-        if(!Game.creeps[name])
-        {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
-        }
-    }
-}
-
-
 function UpdateCreeps()
 {
     for(var name in Game.creeps)
@@ -37,8 +24,6 @@ module.exports.loop = function ()
 	{
 		Blackboard.Initialise();
 		Blackboard.Update();
-
-		ClearDead();
 
 		//SpawnCreeps();
 		//UpdateCreeps();
