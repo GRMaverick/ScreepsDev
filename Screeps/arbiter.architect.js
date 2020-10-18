@@ -13,6 +13,12 @@ module.exports.Initialise = function() {
 	Memory.RepairJobs = [];
 }
 
+var PostCreatedJob = null;
+module.exports.OnJobCreated = function(_callback)
+{
+	PostCreatedJob = _callback;
+}
+
 module.exports.AssignCreepToJob = function(_creep) {
 	let found = Memory.ConstructionJobs.find(element => element.Assigned == false);
 	if(found != null) {
@@ -66,7 +72,7 @@ function UpdateConstructionJobs() {
 				ResourceId: closestResourceId
 			};
 			Memory.ConstructionJobs.push(job);
-			console.log("[ArchitectArbiter]: Job Posted: "+job.Id);
+			PostCreatedJob(job.Id, job.Type);
 		}
 	}
 }
@@ -112,7 +118,7 @@ function UpdateRepairJobs()
 				ResourceId: closestResourceId
 			};
 			Memory.RepairJobs.push(job);
-			console.log("[ArchitectArbiter]: Job Posted: "+job.Id);
+			PostCreatedJob(job.Id, job.Type);
 		}
 	}
 }

@@ -45,9 +45,28 @@ module.exports.Initialise = function() {
 		return true;
 	}
 
+	Memory.JobBoard = [];
+
 	ResourceArbiter.Initialise();
-	ControllerArbiter.Initialise();
+	ResourceArbiter.OnJobCreated(function(_jobId, _jobType))
+	{
+		console.log(_jobType + "job posted: " + _job.Id);
+		Memory.JobBoard.push({JobId:_job.Id, JobType:_jobType});
+	});
+
 	ArchitectArbiter.Initialise();
+	ArchitectArbiter.OnJobCreated(function(_jobId, _jobType))
+	{
+		console.log(_jobType + "job posted: " + _job.Id);
+		Memory.JobBoard.push({JobId:_job.Id, JobType:_jobType});
+	});
+
+	ControllerArbiter.Initialise();
+	ControllerArbiter.OnJobCreated(function(_jobId, _jobType))
+	{
+		console.log(_jobType + "job posted: " + _job.Id);
+		Memory.JobBoard.push({JobId:_job.Id, JobType:_jobType});
+	});
 
 	Memory.BlackboardInitialised = true;
 };
@@ -61,32 +80,41 @@ module.exports.Update = function()
 	ControllerArbiter.Update();
 	ArchitectArbiter.Update();
 
-	var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
-	for(let idx = 0; idx < harvesters.length; idx++) {
-		let harvester = harvesters[idx];
-		if(harvester.memory.job == null) {
-			ResourceArbiter.AssignCreepToJob(harvester);
-		}
-	}
-
-	var upgraders = _.filter(Game.creeps, { memory: { role:"Upgrader"} });
-	for(let idx = 0; idx < upgraders.length; idx++) {
-		let upgrader = upgraders[idx];
-		if(upgrader.memory.job == null) {
-			ControllerArbiter.AssignCreepToJob(upgrader);
-		}
-	}
-
-	var builders = _.filter(Game.creeps, { memory: { role:"Builder"} });
-	for(let idx = 0; idx < builders.length; idx++) {
-		let builder = builders[idx];
-		if(builder.memory.job == null) {
-			ArchitectArbiter.AssignCreepToJob(builder);
-		}
-	}
+	// var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
+	// for(let idx = 0; idx < harvesters.length; idx++) {
+	// 	let harvester = harvesters[idx];
+	// 	if(harvester.memory.job == null) {
+	// 		ResourceArbiter.AssignCreepToJob(harvester);
+	// 	}
+	// }
+	//
+	// var upgraders = _.filter(Game.creeps, { memory: { role:"Upgrader"} });
+	// for(let idx = 0; idx < upgraders.length; idx++) {
+	// 	let upgrader = upgraders[idx];
+	// 	if(upgrader.memory.job == null) {
+	// 		ControllerArbiter.AssignCreepToJob(upgrader);
+	// 	}
+	// }
+	//
+	// var builders = _.filter(Game.creeps, { memory: { role:"Builder"} });
+	// for(let idx = 0; idx < builders.length; idx++) {
+	// 	let builder = builders[idx];
+	// 	if(builder.memory.job == null) {
+	// 		ArchitectArbiter.AssignCreepToJob(builder);
+	// 	}
+	// }
 
 	UpdateCreeps();
 };
+
+function DistributeJobs()
+{
+	var unemployed = _.filter(Game.creeps, { memory: {job: null}});
+	for(let idx = 0; idx < unemployed.length; idx++)
+	{
+		console.log(unemployed.name + "Has no job");
+	}
+}
 
 function SpawnCreeps() {
 	if(ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1") === true) {

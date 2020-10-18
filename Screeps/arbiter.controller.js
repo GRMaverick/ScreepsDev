@@ -10,22 +10,12 @@ module.exports.NotifyDeath = function(_creepName) {
 
 module.exports.Initialise = function() {
 	Memory.ControllerJobs = [];
+}
 
-	var closestResourceId = Game.spawns["Spawn1"].room.controller.pos.findClosestByPath(FIND_SOURCES).id;
-	for(let idx = 0; idx < 3; idx++) {
-		let found = Memory.ControllerJobs.find(element => element.Id == "Upgrade"+"_"+idx);
-		if(found == null) {
-			var job = {
-				Id:"Upgrade"+"_"+idx,
-				Type:"Upgrade",
-				Assigned: false,
-				ResourceId: closestResourceId,
-				ControllerId: Game.spawns["Spawn1"].room.controller.id,
-			};
-			Memory.ControllerJobs.push(job);
-			console.log("[ControllerArbiter]: Job Posted: "+job.Id);
-		}
-	}
+var PostCreatedJob = null;
+module.exports.OnJobCreated = function(_callback)
+{
+	PostCreatedJob = _callback;
 }
 
 module.exports.AssignCreepToJob = function(_creep) {
@@ -41,4 +31,19 @@ module.exports.AssignCreepToJob = function(_creep) {
 
 module.exports.Update = function()
 {
+	var closestResourceId = Game.spawns["Spawn1"].room.controller.pos.findClosestByPath(FIND_SOURCES).id;
+	for(let idx = 0; idx < 3; idx++) {
+		let found = Memory.ControllerJobs.find(element => element.Id == "Upgrade"+"_"+idx);
+		if(found == null) {
+			var job = {
+				Id:"Upgrade"+"_"+idx,
+				Type:"Upgrade",
+				Assigned: false,
+				ResourceId: closestResourceId,
+				ControllerId: Game.spawns["Spawn1"].room.controller.id,
+			};
+			Memory.ControllerJobs.push(job);
+			PostCreatedJob(job.Id, job.Type);
+		}
+	}
 }

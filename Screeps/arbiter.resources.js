@@ -46,6 +46,12 @@ module.exports.Initialise = function() {
 	}
 }
 
+var PostCreatedJob = null;
+module.exports.OnJobCreated = function(_callback)
+{
+	PostCreatedJob = _callback;
+}
+
 module.exports.AssignCreepToJob = function(_creep) {
 	let found = Memory.ResourceJobs.find(element => element.Assigned == false);
 	if(found != null) {
@@ -85,7 +91,7 @@ function UpdateJobs()
 				};
 
 				Memory.ResourceJobs.push(job);
-				console.log("[ResourceArbiter]: Job Posted: "+job.Id);
+				PostCreatedJob(job);
 			}
 		}
 	}
