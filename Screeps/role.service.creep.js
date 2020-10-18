@@ -62,7 +62,7 @@ module.exports.Create = function(_config, _spawn) {
 		let targetBody = GetBestBodyParts(maxEnergyAvailable);
 		let error = Game.spawns[_spawn].spawnCreep(targetBody, name);
 		if(error == OK) {
-			Game.creeps[name].memory = { role:_config.Role };
+			Game.creeps[name].memory = { role:_config.Role, job:null };
 		    console.log("Spawning: " + name + " - Cost: " + CalculateCost(targetBody) + " - Body: " + targetBody.toString());
 			return true;
 		}
@@ -73,7 +73,7 @@ module.exports.Create = function(_config, _spawn) {
 				let defaultCost = CalculateCost(_config.DefaultBody);
 				if(energyAvailable > defaultCost) {
 					Game.spawns[_spawn].spawnCreep(_config.DefaultBody, name);
-				    Game.creeps[name].memory = { role:_config.Role };
+				    Game.creeps[name].memory = { role:_config.Role, job:null };
 				    console.log("Spawning: " + name + " - Cost: " + defaultCost + " - Body: " + _config.DefaultBody.toString());
 					return true;
 				}

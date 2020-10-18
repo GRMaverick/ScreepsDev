@@ -91,7 +91,7 @@ function UpdateJobs()
 				};
 
 				Memory.ResourceJobs.push(job);
-				PostCreatedJob(job);
+				PostCreatedJob(job.Id, job.Type);
 			}
 		}
 	}

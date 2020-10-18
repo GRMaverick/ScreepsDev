@@ -51,21 +51,21 @@ module.exports.Initialise = function() {
 	ResourceArbiter.OnJobCreated(function(_jobId, _jobType)
 	{
 		console.log(_jobType + "job posted: " + _jobId);
-		Memory.JobBoard.push({JobId:_job.Id, JobType:_jobType});
+		Memory.JobBoard.push({JobId:_jobId, JobType:_jobType});
 	});
 
 	ArchitectArbiter.Initialise();
 	ArchitectArbiter.OnJobCreated(function(_jobId, _jobType)
 	{
 		console.log(_jobType + "job posted: " + _jobId);
-		Memory.JobBoard.push({JobId:_job.Id, JobType:_jobType});
+		Memory.JobBoard.push({JobId:_jobId, JobType:_jobType});
 	});
 
 	ControllerArbiter.Initialise();
 	ControllerArbiter.OnJobCreated(function(_jobId, _jobType)
 	{
 		console.log(_jobType + "job posted: " + _jobId);
-		Memory.JobBoard.push({JobId:_job.Id, JobType:_jobType});
+		Memory.JobBoard.push({JobId:_jobId, JobType:_jobType});
 	});
 
 	Memory.BlackboardInitialised = true;
