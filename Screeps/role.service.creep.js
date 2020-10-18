@@ -17,7 +17,7 @@ function CalculateCost(_body) {
                 break;
             case ATTACK:
                 cost = cost + 80;
-                break
+                break;
             case RANGED_ATTACK:
                 cost = cost + 150;
                 break;
@@ -29,7 +29,7 @@ function CalculateCost(_body) {
                 break;
             case TOUGH:
                 cost = cost + 10;
-                break
+                break;
         }
     }
     return cost;
