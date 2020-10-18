@@ -5,6 +5,8 @@ module.exports.NotifyDeath = function(_creepName){
 	if(found != null) {
 		found.Assigned = false;
 		found.Assignee = null;
+		console.log("[ArchitectArbiter]: Notification of Death of " + _creepName + ": Reposting old job!");
+		PostCreatedJob(found.Id, found.Type);
 	}
 }
 
@@ -20,13 +22,21 @@ module.exports.OnJobCreated = function(_callback)
 }
 
 module.exports.AssignCreepToJob = function(_creep) {
-	let found = Memory.ConstructionJobs.find(element => element.Assigned == false);
+	// TODO: check for Repairer v Builder
+	let found = Memory.ConstructionJobs.find(element => element.Id == _jobId);
 	if(found != null) {
-		found.Assigned = true;
-		found.Assignee = _creep.name;
-		_creep.memory.job = found;
-		console.log("[ArchitectArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
-		return;
+		if(found.Assigned) {
+			console.log("[ArchitectArbiter]: Job is already assigned: " + _jobId);
+		}
+		else{
+			found.Assigned = true;
+			found.Assignee = _creep.name;
+			_creep.memory.job = found;
+			console.log("[ArchitectArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
+		}
+	}
+	else{
+		console.log("[ArchitectArbiter]: Job does not exist: "+_jobId);
 	}
 }
 

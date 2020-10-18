@@ -96,7 +96,7 @@ function DistributeJobs()
 		}
 
 		let role = creep.memory.role;
-		let compatibleJob = Memory.JobBoard.find(element => element.Type == role);
+		let compatibleJob = Memory.JobBoard.find(element => element.JobType == role);
 
 		if(compatibleJob == null || compatibleJob == undefined){
 			continue;
@@ -104,18 +104,22 @@ function DistributeJobs()
 
 		if(compatibleJob.JobType == "Harvester"){
 			ResourceArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 		else if(compatibleJob.JobType == "Upgrader"){
 			ControllerArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 		else if(compatibleJob.JobType == "Builder"){
 			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 		else if(compatibleJob.JobType == "Repairer"){
 			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 

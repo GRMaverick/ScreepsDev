@@ -26,6 +26,8 @@ module.exports.NotifyDeath = function(_creepName) {
 	if(found != null) {
 		found.Assigned = false;
 		found.Assignee = null;
+		console.log("[ResourceArbiter]: Notification of Death of " + _creepName + ": Reposting old job!");
+		PostCreatedJob(found.Id, found.Type);
 	}
 }
 
