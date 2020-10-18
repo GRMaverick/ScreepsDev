@@ -40,6 +40,13 @@ function ClearDead() {
     }
 }
 
+function OnJobCreated(_jobId, _jobType) {
+	console.log(_jobType + " job posted: " + _jobId);
+	Memory.JobBoard.push({
+		JobId:_jobId, JobType:_jobType
+	});
+}
+
 module.exports.Initialise = function() {
 	if(Memory.BlackboardInitialised != null && Memory.BlackboardInitialised == true) {
 		return true;
@@ -47,26 +54,19 @@ module.exports.Initialise = function() {
 
 	Memory.JobBoard = [];
 
-	var onJobCreated = function(_jobId, _jobType){
-		console.log(_jobType + " job posted: " + _jobId);
-		Memory.JobBoard.push({
-			JobId:_jobId, JobType:_jobType
-		});
-	};
 	ResourceArbiter.Initialise();
-	ResourceArbiter.OnJobCreated(onJobCreated);
-
-	ArchitectArbiter.Initialise();
-	ArchitectArbiter.OnJobCreated(onJobCreated);
-
 	ControllerArbiter.Initialise();
-	ControllerArbiter.OnJobCreated(onJobCreated);
+	ArchitectArbiter.Initialise();
 
 	Memory.BlackboardInitialised = true;
 };
 
 module.exports.Update = function()
 {
+	ResourceArbiter.OnJobCreated(OnJobCreated);
+	ControllerArbiter.OnJobCreated(OnJobCreated);
+	ArchitectArbiter.OnJobCreated(OnJobCreated);
+
 	ClearDead();
 	SpawnCreeps();
 
