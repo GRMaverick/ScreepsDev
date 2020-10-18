@@ -110,10 +110,12 @@ module.exports.Update = function()
 
 function DistributeJobs()
 {
-	var unemployed = _.filter(Game.creeps, { memory: {job: null}});
+	//var unemployed = _.filter(Game.creeps, { memory: {job: null}});
+	let unemployed = Game.creeps.find(element => (element.memory.job == null || element.memory.job == undefined));
+	console.log(unemployed.length + "un-employed creeps");
 	for(let idx = 0; idx < unemployed.length; idx++)
 	{
-		console.log(unemployed.name + "Has no job");
+		console.log(unemployed[idx].name + "Has no job");
 	}
 }
 
