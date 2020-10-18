@@ -84,30 +84,6 @@ module.exports.Update = function()
 	ArchitectArbiter.Update();
 
 	DistributeJobs();
-	// var harvesters = _.filter(Game.creeps, { memory: { role:"Harvester"} });
-	// for(let idx = 0; idx < harvesters.length; idx++) {
-	// 	let harvester = harvesters[idx];
-	// 	if(harvester.memory.job == null) {
-	// 		ResourceArbiter.AssignCreepToJob(harvester);
-	// 	}
-	// }
-	//
-	// var upgraders = _.filter(Game.creeps, { memory: { role:"Upgrader"} });
-	// for(let idx = 0; idx < upgraders.length; idx++) {
-	// 	let upgrader = upgraders[idx];
-	// 	if(upgrader.memory.job == null) {
-	// 		ControllerArbiter.AssignCreepToJob(upgrader);
-	// 	}
-	// }
-	//
-	// var builders = _.filter(Game.creeps, { memory: { role:"Builder"} });
-	// for(let idx = 0; idx < builders.length; idx++) {
-	// 	let builder = builders[idx];
-	// 	if(builder.memory.job == null) {
-	// 		ArchitectArbiter.AssignCreepToJob(builder);
-	// 	}
-	// }
-
 	UpdateCreeps();
 };
 
@@ -119,8 +95,6 @@ function DistributeJobs()
 			continue;
 		}
 
-		debugger;
-		
 		let role = creep.memory.role;
 		let compatibleJob = Memory.JobBoard.find(element => element.Type == role);
 
@@ -128,7 +102,22 @@ function DistributeJobs()
 			continue;
 		}
 
-		debugger;
+		if(compatibleJob.JobType == "Harvester"){
+			ResourceArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			continue;
+		}
+		else if(compatibleJob.JobType == "Upgrader"){
+			ControllerArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			continue;
+		}
+		else if(compatibleJob.JobType == "Builder"){
+			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			continue;
+		}
+		else if(compatibleJob.JobType == "Repairer"){
+			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
+			continue;
+		}
 
 		console.log(name + " is unemployed!");
     }

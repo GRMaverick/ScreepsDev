@@ -31,8 +31,6 @@ module.exports.NotifyDeath = function(_creepName) {
 
 module.exports.Initialise = function() {
 	Memory.ResourceJobs = [];
-	Memory.EfficiencyRA = 0;
-	Memory.EnergyPerTick = 0;
 
 	const resources = Game.spawns["Spawn1"].room.find(FIND_SOURCES);
 	for(var idx = 0; idx < resources.length; idx++) {
@@ -52,14 +50,21 @@ module.exports.OnJobCreated = function(_callback)
 	PostCreatedJob = _callback;
 }
 
-module.exports.AssignCreepToJob = function(_creep) {
-	let found = Memory.ResourceJobs.find(element => element.Assigned == false);
+module.exports.AssignCreepToJob = function(_creep, _jobId) {
+	let found = Memory.ResourceJobs.find(element => element.Id == _jobId);
 	if(found != null) {
-		found.Assigned = true;
-		found.Assignee = _creep.name;
-		_creep.memory.job = found;
-		console.log("[ResourceArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
-		return;
+		if(found.Assigned) {
+			console.log("[ResourceArbiter]: Job is already assigned: " + _jobId);
+		}
+		else{
+			found.Assigned = true;
+			found.Assignee = _creep.name;
+			_creep.memory.job = found;
+			console.log("[ResourceArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
+		}
+	}
+	else{
+		console.log("[ResourceArbiter]: Job does not exist: "+_jobId);
 	}
 }
 
