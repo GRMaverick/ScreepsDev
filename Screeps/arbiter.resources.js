@@ -7,6 +7,7 @@ var Services = require('role.service.actions');
 
 function Initialise() {
 	Memory.ResourceJobs = [];
+	Memory.ResourcePoints = Utilities.GetResourcePoints(Game.spawns["Spawn1"].room);
 }
 
 function AssignCreepToJob(_creep, _jobId) {
@@ -29,9 +30,7 @@ function Update() {
 		var job = {
 			Id:"Harvesting",
 			Type:"Harvester",
-			Assignees: [],
-			DeliveryPoint: Game.spawns["Spawn1"].id,
-			ResourcePoints: Utilities.GetResourcePoints(Game.spawns["Spawn1"].room),
+			Assignees: []
 		};
 
 		Memory.ResourceJobs.push(job);
