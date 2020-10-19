@@ -128,3 +128,17 @@ module.exports.GetBestBodyParts = function(_energy) {
 	}
 	return body;
 }
+
+module.exports.GetResourcePoints = function(_room)
+{
+	const resources = _room.find(FIND_SOURCES);
+	var aResourcePoints = [];
+	for(let idx = 0; idx < resources.length; idx++) {
+		var oResourcePoint = {
+			ResourceId: resources[idx].id,
+			AssignedCreeps: []
+		};
+		aResourcePoints.push(oResourcePoint);
+	}
+	return aResourcePoints;
+}

@@ -1,3 +1,4 @@
+var Utilities = require('utilities');
 var Services = require('role.service.actions');
 
 module.exports.NotifyDeath = function(_creepName){
@@ -88,7 +89,7 @@ function UpdateConstructionJobs() {
 				Assigned: false,
 				Assignee: null,
 				ConstructionSiteId: site.id,
-				ResourceId: closestResourceId
+				ResourcePoints: Utilities.GetResourcePoints(Game.spawns["Spawn1"].room),
 			};
 			Memory.ConstructionJobs.push(job);
 			PostCreatedJob(job.Id, job.Type);
@@ -134,7 +135,7 @@ function UpdateRepairJobs()
 				Assigned: false,
 				Assignee: null,
 				StructureId: structure.id,
-				ResourceId: closestResourceId
+				ResourcePoints: Utilities.GetResourcePoints(Game.spawns["Spawn1"].room),
 			};
 			Memory.RepairJobs.push(job);
 			PostCreatedJob(job.Id, job.Type);

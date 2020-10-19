@@ -31,15 +31,13 @@ module.exports.Deliver = function(_creep, _data) {
 
 module.exports.Harvest = function(_creep) {
 	let jobData = _creep.memory.job;
-	let target = Game.getObjectById(jobData.ResourceId);
+	let targetResource = _creep.memory.job.ResourcePoints.find(element =>
+		element.AssignedCreeps.length < 8);
+	let target = Game.getObjectById(targetResource.ResourceId);
+
 	let result = _creep.harvest(target);
 	if(result == ERR_NOT_IN_RANGE) {
-		if(jobData.AccessPoint != undefined) {
-			_creep.moveTo(jobData.AccessPoint.x, jobData.AccessPoint.y);
-		}
-		else {
-			_creep.moveTo(target);
-		}
+		_creep.moveTo(target);
 		return true;
 	}
 	else if(result != OK) {

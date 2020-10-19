@@ -1,3 +1,4 @@
+var Utilities = require('utilities');
 var Services = require('role.service.actions');
 
 module.exports.NotifyDeath = function(_creepName) {
@@ -57,8 +58,8 @@ module.exports.Update = function()
 				Id:"Upgrade"+"_"+idx,
 				Type:"Upgrader",
 				Assigned: false,
-				ResourceId: closestResourceId,
 				ControllerId: Game.spawns["Spawn1"].room.controller.id,
+				ResourcePoints: Utilities.GetResourcePoints(Game.spawns["Spawn1"].room),
 			};
 			Memory.ControllerJobs.push(job);
 			PostCreatedJob(job.Id, job.Type);
