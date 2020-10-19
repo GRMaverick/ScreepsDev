@@ -8,6 +8,7 @@ var Services = require('role.service.actions');
 function Initialise() {
 	Memory.ResourceJobs = [];
 	Memory.ResourcePoints = Utilities.GetResourcePoints(Game.spawns["Spawn1"].room);
+	Memory.ResourceArbiterDebug = false;
 }
 
 function AssignCreepToJob(_creep, _jobId) {
@@ -24,6 +25,18 @@ function AssignCreepToJob(_creep, _jobId) {
 }
 
 function Update() {
+	if(Memory.ResourceArbiterDebug)
+	{
+		for(let i = 0; i < Memory.ResourcePoints.length; i++){
+			if(Memory.ResourcePoints[i].AssignedCreeps.length > 0){
+				console.log("Resource: " + Memory.ResourcePoints[i].ResourceId);
+				for(let j = 0; j < Memory.ResourcePoints[i].AssignedCreeps.length; j++){
+					console.log("\tCreep: " + Memory.ResourcePoints[i].AssignedCreeps[j]);
+				}
+			}
+		}
+	}
+
 	// Perpetual Job
 	let found = Memory.ResourceJobs.find(element => element.Id == "Harvesting");
 	if(found == null) {
