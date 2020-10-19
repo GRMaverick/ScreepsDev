@@ -90,7 +90,6 @@ function UpdateConstructionJobs() {
 		let site = constructionSites[idx];
 		let found = Memory.ConstructionJobs.find(element => element.Id == "ConstructionSite_"+site.id);
 		if(found == null) {
-			var closestResourceId = site.pos.findClosestByPath(FIND_SOURCES).id;
 			var job = {
 				Id: "ConstructionSite_"+site.id,
 				Type: "Builder",
@@ -136,7 +135,6 @@ function UpdateRepairJobs()
 		let structure = structures[idx];
 		let found = Memory.RepairJobs.find(element => element.Id == "Repair_"+structure.id);
 		if(found == null && structure.hits <= (structure.hitsMax * kRepairThreshold)) {
-			var closestResourceId = structure.pos.findClosestByPath(FIND_SOURCES).id;
 			var job = {
 				Id: "Repair_"+structure.id,
 				Type: "Repairer",
