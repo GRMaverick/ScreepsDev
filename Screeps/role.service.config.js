@@ -21,7 +21,7 @@ module.exports.Builder = {
 };
 
 module.exports.Harvester = {
-	Min: 3,
+	Min: 5,
     Role: "Harvester",
 	DefaultBody: [
 		WORK,

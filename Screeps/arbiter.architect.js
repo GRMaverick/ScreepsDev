@@ -1,12 +1,19 @@
 var Utilities = require('utilities');
 var Services = require('role.service.actions');
 
+function Log(_string){
+	if(Memory.ArchitectArbiterLogging)
+	{
+		console.log("[ArchitectArbiter]: " + _string);
+	}
+}
+
 module.exports.NotifyDeath = function(_creepName){
 	let found = Memory.ConstructionJobs.find(element => element.Assignee == _creepName);
 	if(found != null) {
 		found.Assigned = false;
 		found.Assignee = null;
-		console.log("[ArchitectArbiter]: Notification of Death of " + _creepName + ": Reposting old job!");
+		Log("Notification of Death of " + _creepName + ": Reposting old job!");
 		PostCreatedJob(found.Id, found.Type);
 	}
 }
@@ -14,6 +21,7 @@ module.exports.NotifyDeath = function(_creepName){
 module.exports.Initialise = function() {
 	Memory.ConstructionJobs = [];
 	Memory.RepairJobs = [];
+	Memory.ArchitectArbiterLogging = false;
 }
 
 var PostCreatedJob = null;
@@ -35,18 +43,18 @@ module.exports.AssignCreepToJob = function(_creep, _jobId) {
 	let found = Memory.ConstructionJobs.find(element => element.Id == _jobId);
 	if(found != null) {
 		if(found.Assigned) {
-			console.log("[ArchitectArbiter]: Job is already assigned: " + _jobId);
+			Log("Job is already assigned: " + _jobId);
 		}
 		else{
 			found.Assigned = true;
 			found.Assignee = _creep.name;
 			_creep.memory.job = found;
-			console.log("[ArchitectArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
+			Log("Resource Job Assigned: " + found.Assignee + " " + found.Id);
 			PostJobAssigned(_creep, found.Id, found.Type);
 		}
 	}
 	else{
-		console.log("[ArchitectArbiter]: Job does not exist: "+_jobId);
+		Log("Job does not exist: " + _jobId);
 	}
 }
 
@@ -68,7 +76,7 @@ function UpdateConstructionJobs() {
 			for(let jdx = 0; jdx < Memory.ConstructionJobs.length; jdx++) {
 				if(builders[idx].memory.job != undefined) {
 					if(Memory.ConstructionJobs[jdx].ConstructionSiteId == builders[idx].memory.job.ConstructionSiteId) {
-						console.log("[ArchitectArbiter]: Job Completed: " + builders[idx].name + " - " + builders[idx].memory.job.Id);
+						Log("Job Completed: " + builders[idx].name + " - " + builders[idx].memory.job.Id);
 						delete builders[idx].memory.job;
 						Memory.ConstructionJobs.splice(jdx, 1);
 					}
@@ -113,7 +121,7 @@ function UpdateRepairJobs()
 			for(let jdx = 0; jdx < Memory.RepairJobs.length; jdx++) {
 				if(creeps[idx].memory.job != undefined) {
 					if(Memory.RepairJobs[jdx].StructureId == creeps[idx].memory.job.StructureId) {
-						console.log("[ArchitectArbiter]: Job Completed: " + creeps[idx].name + " - " + creeps[idx].memory.job.Id);
+						Log("Job Completed: " + creeps[idx].name + " - " + creeps[idx].memory.job.Id);
 						delete creeps[idx].memory.job;
 						Memory.RepairJobs.splice(jdx, 1);
 					}

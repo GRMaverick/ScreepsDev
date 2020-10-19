@@ -2,6 +2,13 @@ var Services = require('role.service.actions');
 var ServiceCreepConfig = require('role.service.config');
 var Utilities = require('utilities');
 
+function Log(_string){
+	if(Memory.SpawnLogging)
+	{
+		console.log("[Spawn]: " + _string);
+	}
+}
+
 module.exports.Create = function(_config, _spawn) {
 	if( Game.spawns[_spawn].spawning )
         return true;
@@ -15,7 +22,7 @@ module.exports.Create = function(_config, _spawn) {
 		let error = Game.spawns[_spawn].spawnCreep(targetBody, name);
 		if(error == OK) {
 			Game.creeps[name].memory = { role:_config.Role, job:null };
-		    console.log("Spawning: " + name + " - Cost: " + Utilities.CalculateCost(targetBody) + " - Body: " + targetBody.toString());
+		    Log("Spawning: " + name + " - Cost: " + Utilities.CalculateCost(targetBody) + " - Body: " + targetBody.toString());
 			return true;
 		}
 		else if(error == ERR_NOT_ENOUGH_ENERGY) {
@@ -26,7 +33,7 @@ module.exports.Create = function(_config, _spawn) {
 				if(energyAvailable > defaultCost) {
 					Game.spawns[_spawn].spawnCreep(_config.DefaultBody, name);
 				    Game.creeps[name].memory = { role:_config.Role, job:null };
-				    console.log("Spawning: " + name + " - Cost: " + defaultCost + " - Body: " + _config.DefaultBody.toString());
+				    Log("Spawning: " + name + " - Cost: " + defaultCost + " - Body: " + _config.DefaultBody.toString());
 					return true;
 				}
 			}

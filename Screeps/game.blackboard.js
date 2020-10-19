@@ -6,6 +6,13 @@ var ServiceCreep = require('role.service.creep');
 var ServiceCreepConfig = require('role.service.config');
 var Utilities = require('utilities');
 
+function Log(_string){
+	if(Memory.ResourceArbiterDebug)
+	{
+		console.log("[Blackboard]: " + _string);
+	}
+}
+
 function RoadEndToEnd(_startNode, _endNode) {
 	var result = Utilities.PathEndToEnd(_startNode, _endNode);
 	var results = result.path.length;
@@ -35,7 +42,7 @@ function ClearDead() {
 			}
 
             delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
+            Log('Clearing non-existing creep memory:', name);
         }
     }
 }
@@ -45,6 +52,9 @@ module.exports.Initialise = function() {
 		return true;
 	}
 
+	Memory.SpawnLogging = false;
+	Memory.BlackboardLogging = false;
+	
 	Memory.JobBoard = [];
 
 	ResourceArbiter.Initialise();
@@ -57,7 +67,7 @@ module.exports.Initialise = function() {
 module.exports.Update = function()
 {
 	var OnJobCreated = function(_jobId, _jobType) {
-		console.log(_jobType + " job posted: " + _jobId);
+		Log(_jobType + " job posted: " + _jobId);
 		Memory.JobBoard.push({
 			JobId:_jobId, JobType:_jobType
 		});
@@ -69,7 +79,7 @@ module.exports.Update = function()
 	};
 
 	var OnPerpetualJobAssigned = function(_creep, _jobId, _jobType) {
-
+		Log(_jobType + " perpetual job assigned: " + _jobId);
 	};
 
 	ResourceArbiter.OnJobCreated(OnJobCreated);
@@ -127,7 +137,7 @@ function DistributeJobs()
 			continue;
 		}
 
-		console.log(name + " is unemployed!");
+		Log(name + " is unemployed!");
     }
 }
 
