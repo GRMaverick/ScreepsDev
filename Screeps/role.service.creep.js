@@ -13,7 +13,7 @@ module.exports.Create = function(_config, _spawn) {
 	if( Game.spawns[_spawn].spawning )
         return true;
 
-	let maxEnergyAvailable = Game.spawns[_spawn].room.energyAvailable;
+	let maxEnergyAvailable = Game.spawns[_spawn].room.energyCapacityAvailable;
 	var creepCount = _.sum( Game.creeps, { memory: { role: _config.Role } } );
 	if(creepCount < _config.Min) {
 		// Attempt Biggest boy
