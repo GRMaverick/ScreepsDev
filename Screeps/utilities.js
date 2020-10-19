@@ -79,3 +79,52 @@ module.exports.GetNumOfParts = function(_creepBody, _targetBodyPart) {
 	}
 	return amount;
 }
+
+
+module.exports.CalculateCost = function(_body) {
+    var cost = 0;
+    for(var i in _body) {
+        switch(_body[i]) {
+            case MOVE:
+                cost = cost + 50;
+                break;
+            case WORK:
+                cost = cost + 100;
+                break;
+            case CARRY:
+                cost = cost + 50;
+                break;
+            case ATTACK:
+                cost = cost + 80;
+                break;
+            case RANGED_ATTACK:
+                cost = cost + 150;
+                break;
+            case HEAL:
+                cost = cost + 250;
+                break;
+            case CLAIM:
+                cost = cost + 600;
+                break;
+            case TOUGH:
+                cost = cost + 10;
+                break;
+        }
+    }
+    return cost;
+}
+
+module.exports.GetBestBodyParts = function(_energy) {
+	let totalParts = Math.floor(_energy / this.CalculateCost([WORK, MOVE, CARRY]));
+	var body = [];
+	for(let i = 0; i < totalParts; i++) {
+		body.push(WORK);
+	}
+	for(let i = 0; i < totalParts; i++) {
+		body.push(CARRY);
+	}
+	for(let i = 0; i < totalParts; i++) {
+		body.push(MOVE);
+	}
+	return body;
+}

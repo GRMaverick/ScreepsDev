@@ -40,13 +40,6 @@ function ClearDead() {
     }
 }
 
-function OnJobCreated(_jobId, _jobType) {
-	console.log(_jobType + " job posted: " + _jobId);
-	Memory.JobBoard.push({
-		JobId:_jobId, JobType:_jobType
-	});
-}
-
 module.exports.Initialise = function() {
 	if(Memory.BlackboardInitialised != null && Memory.BlackboardInitialised == true) {
 		return true;
@@ -63,9 +56,33 @@ module.exports.Initialise = function() {
 
 module.exports.Update = function()
 {
+	var OnJobCreated = function(_jobId, _jobType) {
+		console.log(_jobType + " job posted: " + _jobId);
+		Memory.JobBoard.push({
+			JobId:_jobId, JobType:_jobType
+		});
+	};
+
+	var OnJobAssigned = function(_creep, _jobId, _jobType) {
+		let compatibleJob = Memory.JobBoard.find(element => element.JobType == _jobType && element.JobId == _jobId);
+		Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
+	};
+
+	var OnPerpetualJobAssigned = function(_creep, _jobId, _jobType) {
+
+	};
+
 	ResourceArbiter.OnJobCreated(OnJobCreated);
+	ResourceArbiter.OnJobAssigned(OnJobAssigned);
+	ResourceArbiter.OnPerpetualJobAssigned(OnPerpetualJobAssigned);
+
 	ControllerArbiter.OnJobCreated(OnJobCreated);
+	ControllerArbiter.OnJobAssigned(OnJobAssigned);
+	ControllerArbiter.OnPerpetualJobAssigned(OnPerpetualJobAssigned);
+
 	ArchitectArbiter.OnJobCreated(OnJobCreated);
+	ArchitectArbiter.OnJobAssigned(OnJobAssigned);
+	ArchitectArbiter.OnPerpetualJobAssigned(OnPerpetualJobAssigned);
 
 	ClearDead();
 	SpawnCreeps();
@@ -95,22 +112,18 @@ function DistributeJobs()
 
 		if(compatibleJob.JobType == "Harvester"){
 			ResourceArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 		else if(compatibleJob.JobType == "Upgrader"){
 			ControllerArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 		else if(compatibleJob.JobType == "Builder"){
 			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 		else if(compatibleJob.JobType == "Repairer"){
 			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
 			continue;
 		}
 

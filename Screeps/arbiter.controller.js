@@ -15,9 +15,17 @@ module.exports.Initialise = function() {
 }
 
 var PostCreatedJob = null;
-module.exports.OnJobCreated = function(_callback)
-{
+var PostJobAssigned = null;
+var PostPerptualJobAssigned = null;
+
+module.exports.OnJobCreated = function(_callback) {
 	PostCreatedJob = _callback;
+}
+module.exports.OnJobAssigned = function(_callback) {
+	PostJobAssigned = _callback;
+}
+module.exports.OnPerpetualJobAssigned = function(_callback) {
+	PostPerptualJobAssigned = _callback;
 }
 
 module.exports.AssignCreepToJob = function(_creep, _jobId) {
@@ -31,6 +39,7 @@ module.exports.AssignCreepToJob = function(_creep, _jobId) {
 			found.Assignee = _creep.name;
 			_creep.memory.job = found;
 			console.log("[ControllerArbiter]: Resource Job Assigned: "+found.Assignee+" "+found.Id);
+			PostJobAssigned(_creep, found.Id, found.Type);
 		}
 	}
 	else{
