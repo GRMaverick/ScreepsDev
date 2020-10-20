@@ -51,16 +51,27 @@ module.exports.Deliver = function(_creep, _data) {
 };
 
 module.exports.Harvest = function(_creep) {
+	let targetResource = null;
+	for(let i = 0; i < Memory.ResourcePoints.length; i++){
+		for(let j = 0; j < Memory.ResourcePoints[i].AssignedCreeps.length; j++){
+			if(_creep.name == Memory.ResourcePoints[i].AssignedCreeps[j]) {
+				targetResource = Memory.ResourcePoints[i];
+			}
+		}
+	}
+
+	if(targetResource == null) {
+		targetResource = Memory.ResourcePoints.find(element => element.AssignedCreeps.length < 8);
+	}
+
+	if(targetResource == null) {
+		console.log("PROBLEM");
+	}
+
 	let jobData = _creep.memory.job;
-	let targetResource = Memory.ResourcePoints.find(element => element.AssignedCreeps.length < 8);
 	let target = Game.getObjectById(targetResource.ResourceId);
 	let result = _creep.harvest(target);
 	if(result == ERR_NOT_IN_RANGE) {
-		let found = targetResource.AssignedCreeps.find(element => element == _creep.name);
-		if(found == null || found == undefined){
-			UnassignFromResourcePoint(_creep);
-			targetResource.AssignedCreeps.push(_creep.name);
-		}
 		_creep.moveTo(target);
 		return true;
 	}
