@@ -11,7 +11,7 @@ module.exports.PRIORITY_UPGRADE 	= PRIORITY_UPGRADE;
 module.exports.PRIORITY_DELIVER 	= PRIORITY_DELIVER;
 
 module.exports.Builder = {
-	Min: 4,
+	Min: 0,
     Role: "Builder",
     DefaultBody: [
 		WORK,
@@ -21,7 +21,7 @@ module.exports.Builder = {
 };
 
 module.exports.Harvester = {
-	Min: 5,
+	Min: 8,
     Role: "Harvester",
 	DefaultBody: [
 		WORK,
@@ -31,7 +31,7 @@ module.exports.Harvester = {
 };
 
 module.exports.Upgrader = {
-	Min: 3,
+	Min: 8,
     Role: "Upgrader",
 	DefaultBody: [
 		WORK,
