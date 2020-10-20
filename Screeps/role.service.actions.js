@@ -58,15 +58,19 @@ module.exports.Deliver = function(_creep, _data) {
 module.exports.Harvest = function(_creep) {
 	let targetResource = null;
 	for(let i = 0; i < Memory.ResourcePoints.length; i++){
-		for(let j = 0; j < Memory.ResourcePoints[i].AssignedCreeps.length; j++){
-			if(_creep.name == Memory.ResourcePoints[i].AssignedCreeps[j]) {
-				targetResource = Memory.ResourcePoints[i];
+		var potentialTarget = Game.getObjectById(Memory.ResourcePoints[i].ResourceId);
+		if(potentialTarget.energy > 0) {
+			for(let j = 0; j < Memory.ResourcePoints[i].AssignedCreeps.length; j++){
+				if(_creep.name == Memory.ResourcePoints[i].AssignedCreeps[j]) {
+					targetResource = Memory.ResourcePoints[i];
+				}
 			}
 		}
 	}
 
 	if(targetResource == null) {
 		targetResource = Memory.ResourcePoints.find(element => element.AssignedCreeps.length < 8);
+		targetResource.AssignedCreeps.push(_creep.name);
 	}
 
 	if(targetResource == null) {
