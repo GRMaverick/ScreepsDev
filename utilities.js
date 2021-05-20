@@ -32,6 +32,10 @@ module.exports.LogError = function(_funcName, _error) {
 			console.log(_funcName+": ERR_NO_BODYPART");
 			break;
 		}
+		case ERR_FULL: {
+		    console.log(_funcName+": ERR_FULL");
+			break;
+		}
 	}
 }
 
