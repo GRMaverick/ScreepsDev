@@ -1,17 +1,17 @@
-var Services = require('role.service.actions');
-var ServiceCreepConfig = require('role.service.config');
+var Tasks = require('role.service.actions');
+var Config = require('role.service.config');
 var Utilities = require('utilities');
 
 function Log(_string){
-	if(Memory.SpawnLogging)
-	{
-		console.log("[Spawn]: " + _string);
+	if(Memory.SpawnLogging)	{
+		console.log("[Creep]: " + _string);
 	}
 }
 
 module.exports.Create = function(_config, _spawn) {
-	if( Game.spawns[_spawn].spawning )
+	if( Game.spawns[_spawn].spawning ){ 
         return true;
+	}
 
 	let maxEnergyAvailable = Game.spawns[_spawn].room.energyCapacityAvailable;
 	var creepCount = _.sum( Game.creeps, { memory: { role: _config.Role } } );
@@ -21,7 +21,8 @@ module.exports.Create = function(_config, _spawn) {
 		let targetBody = Utilities.GetBestBodyParts(maxEnergyAvailable);
 		let error = Game.spawns[_spawn].spawnCreep(targetBody, name);
 		if(error == OK) {
-			Game.creeps[name].memory = { role:_config.Role, job:null };
+			Game.creeps[name].memory = { role:_config.Role, tasks:[] };
+		    Game.creeps[name].memory.tasks = [];
 		    Log("Spawning: " + name + " - Cost: " + Utilities.CalculateCost(targetBody) + " - Body: " + targetBody.toString());
 			return true;
 		}
@@ -32,7 +33,8 @@ module.exports.Create = function(_config, _spawn) {
 				let defaultCost = Utilities.CalculateCost(_config.DefaultBody);
 				if(energyAvailable > defaultCost) {
 					Game.spawns[_spawn].spawnCreep(_config.DefaultBody, name);
-				    Game.creeps[name].memory = { role:_config.Role, job:null };
+				    Game.creeps[name].memory = { role:_config.Role, tasks:[] };
+				    Game.creeps[name].memory.tasks = [];
 				    Log("Spawning: " + name + " - Cost: " + defaultCost + " - Body: " + _config.DefaultBody.toString());
 					return true;
 				}
@@ -47,67 +49,41 @@ module.exports.Create = function(_config, _spawn) {
 };
 
 module.exports.Update = function(_creep) {
-	if(_creep.spawning || !_creep.memory.job) {
+	if(_creep.spawning) {
+	    Log("Update Skipped - Spawning!");
 		return;
 	}
-
-	if(_creep.memory.job.Type == "Builder") {
-		if(_creep.memory.building && _creep.store[RESOURCE_ENERGY] == 0) {
-			_creep.memory.building = false;
-			_creep.say('🔄 harvest');
-		}
-		if(!_creep.memory.building && _creep.store.getFreeCapacity() == 0) {
-			_creep.memory.building = true;
-			_creep.say('⚡ upgrade');
-		}
-
-		if(_creep.memory.building) {
-			Services.Build(_creep);
-		}
-		else {
-			Services.Harvest(_creep);
-		}
+	
+    if(_creep.memory.tasks.length == 0) {
+	    Log("Update Skipped - No Tasks!");
+		return;
 	}
-	else if (_creep.memory.job.Type == "Harvester") {
-		if(_creep.store.getFreeCapacity() == 0) {
-			Services.Deliver(_creep);
-		}
-		else {
-			Services.Harvest(_creep);
-		}
-	}
-	else if (_creep.memory.job.Type == "Upgrader") {
-		if(_creep.memory.upgrading && _creep.store[RESOURCE_ENERGY] == 0) {
-			_creep.memory.upgrading = false;
-			_creep.say('🔄 harvest');
-		}
-		if(!_creep.memory.upgrading && _creep.store.getFreeCapacity() == 0) {
-			_creep.memory.upgrading = true;
-			_creep.say('⚡ upgrade');
-		}
-
-		if(_creep.memory.upgrading) {
-			Services.Upgrade(_creep);
-		}
-		else {
-			Services.Harvest(_creep);
-		}
-	}
-	else if (_creep.memory.job.Type == "Repairer") {
-		if(_creep.memory.repairing && _creep.store[RESOURCE_ENERGY] == 0) {
-			_creep.memory.repairing = false;
-			_creep.say('🔄 harvest');
-		}
-		if(!_creep.memory.repairing && _creep.store.getFreeCapacity() == 0) {
-			_creep.memory.repairing = true;
-			_creep.say('⚡ repair');
-		}
-
-		if(_creep.memory.repairing) {
-			Services.Repair(_creep);
-		}
-		else {
-			Services.Harvest(_creep);
-		}
-	}
+	
+    let task = _creep.memory.tasks[_creep.memory.tasks.length-1];
+    if(task == undefined || task == null) {
+        Log("Invalid Task!");
+        return;
+    }
+    
+    switch(task.Type) {
+        case 'Harvest':{
+            return Tasks.Harvest(_creep, task);
+        }
+        case 'Deliver':{
+            return Tasks.Deliver(_creep, task);
+        }
+        case 'Upgrade': {
+            return Tasks.Upgrade(_creep, task);
+        }
+        case 'Build': {
+            return Tasks.Build(_creep, task);
+        }
+        case 'Repair': {
+            return Tasks.Repair(_creep, task);
+        }
+        default: {
+            Log("Unknown Work: "+task.Type);
+            break;
+        }
+    }
 };

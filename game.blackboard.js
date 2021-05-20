@@ -1,13 +1,12 @@
-var ResourceArbiter = require('arbiter.resources');
-var ControllerArbiter = require('arbiter.controller');
-var ArchitectArbiter = require('arbiter.architect');
-
 var ServiceCreep = require('role.service.creep');
+var Tasks = require('role.service.actions');
 var ServiceCreepConfig = require('role.service.config');
 var Utilities = require('utilities');
 
+var ArchitectArbiter = require('arbiter.architect');
+
 function Log(_string){
-	if(Memory.ResourceArbiterDebug)
+	if(Memory.BlackboardLogging)
 	{
 		console.log("[Blackboard]: " + _string);
 	}
@@ -28,127 +27,168 @@ function RoadEndToEnd(_startNode, _endNode) {
 function ClearDead() {
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
-			if(Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Harvester") {
-				ResourceArbiter.NotifyDeath(name);
-			}
-			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Upgrader") {
-				ControllerArbiter.NotifyDeath(name);
-			}
-			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Builder") {
-				ArchitectArbiter.NotifyDeath(name);
-			}
-			else if (Memory.creeps[name].job != undefined && Memory.creeps[name].job.Type == "Repairer") {
-				ArchitectArbiter.NotifyDeath(name);
-			}
-
             delete Memory.creeps[name];
             Log('Clearing non-existing creep memory:', name);
         }
     }
 }
 
+function GenerateRoadNetwork() {
+    
+}
+
 module.exports.Initialise = function() {
-	if(Memory.BlackboardInitialised != null && Memory.BlackboardInitialised == true) {
+    if(Memory.BlackboardInitialised != null && Memory.BlackboardInitialised == true) {
 		return true;
 	}
-
+	
+	Memory.ResourcePoints = Utilities.GetResourcePoints(Game.spawns["Spawn1"].room);
 	Memory.SpawnLogging = false;
 	Memory.BlackboardLogging = false;
 	
-	Memory.JobBoard = [];
-
-	ResourceArbiter.Initialise();
-	ControllerArbiter.Initialise();
+	GenerateRoadNetwork();
+	
 	ArchitectArbiter.Initialise();
-
+	
 	Memory.BlackboardInitialised = true;
 };
 
-module.exports.Update = function()
-{
-	var OnJobCreated = function(_jobId, _jobType) {
-		Log(_jobType + " job posted: " + _jobId);
-		Memory.JobBoard.push({
-			JobId:_jobId, JobType:_jobType
-		});
-	};
-
-	var OnJobAssigned = function(_creep, _jobId, _jobType) {
-		let compatibleJob = Memory.JobBoard.find(element => element.JobType == _jobType && element.JobId == _jobId);
-		Memory.JobBoard.splice(Memory.JobBoard.indexOf(compatibleJob), 1);
-	};
-
-	var OnPerpetualJobAssigned = function(_creep, _jobId, _jobType) {
-		Log(_jobType + " perpetual job assigned: " + _jobId);
-	};
-
-	ResourceArbiter.OnJobCreated(OnJobCreated);
-	ResourceArbiter.OnJobAssigned(OnJobAssigned);
-	ResourceArbiter.OnPerpetualJobAssigned(OnPerpetualJobAssigned);
-
-	ControllerArbiter.OnJobCreated(OnJobCreated);
-	ControllerArbiter.OnJobAssigned(OnJobAssigned);
-	ControllerArbiter.OnPerpetualJobAssigned(OnPerpetualJobAssigned);
-
-	ArchitectArbiter.OnJobCreated(OnJobCreated);
-	ArchitectArbiter.OnJobAssigned(OnJobAssigned);
-	ArchitectArbiter.OnPerpetualJobAssigned(OnPerpetualJobAssigned);
-
-	ClearDead();
-	SpawnCreeps();
-
-	ResourceArbiter.Update();
-	ControllerArbiter.Update();
+module.exports.Update = function() {
 	ArchitectArbiter.Update();
-
-	DistributeJobs();
-	UpdateCreeps();
+	
+    ClearDead();
+    SpawnCreeps();
+    DistributeJobs();
+    
+    UpdateCreeps();
 };
 
-function DistributeJobs()
-{
-	for(var name in Game.creeps) {
+function GetBestResourcePoint(){
+    for(let i = 0; i < Memory.ResourcePoints.length; i++){
+        
+    }
+}
+
+function GenerateHarvestingWork(_creep) {
+    Log("Generate Harvesting Work!");
+    var task = new Tasks.HarvestTask(Memory.ResourcePoints[0].ResourceId);
+    _creep.memory.tasks.push(task);
+}
+function GenerateConstructionJob(_creep){
+    Log("Generate Construction Work!");
+    if(Memory.ConstructionJobs.length > 0){
+        var task = new Tasks.BuildTask(Memory.ConstructionJobs[0].ConstructionSiteId);
+        _creep.memory.tasks.push(task);
+    }
+}
+function GenerateRepairJob(_creep){
+    Log("Generate Repairing Work!");
+    if(Memory.RepairJobs.length > 0){
+        var task = new Tasks.RepairTask(Memory.RepairJobs[0].StructureId);
+        _creep.memory.tasks.push(task);
+    }
+}
+function GenerateDeliveryJob(_creep, _target){
+    Log("Generate Delivery Work!" + _target);
+    var task = new Tasks.DeliverTask(_target);
+    _creep.memory.tasks.push(task);
+}
+function GenerateUpgradeJob(_creep){
+    var task = new Tasks.UpgradeTask(Game.spawns["Spawn1"].room.controller.id);
+    _creep.memory.tasks.push(task);
+}
+
+function DistributeJobs() {
+    for(var name in Game.creeps) {
         var creep = Game.creeps[name];
-		if(creep.memory.job != null && creep.memory.job != undefined) {
-			continue;
-		}
+        if(creep.memory.tasks == null)  {
+            continue;
+        }
+        
+        if(creep.memory.tasks.length == 0) {
+            Log(name + " is unemployed");
+            if(creep.store.getFreeCapacity() > 0) {
+                GenerateHarvestingWork(creep);
+            }
+            else {
+                // Check for pop count
+                if(Game.creeps.length > 4) {
+                    // high
+                    if(Memory.ConstructionJobs.length > 0) {
+                        // Check for construction
+                        GenerateConstructionJob(creep);
+                        continue;
+                    }
+                    else if(Memory.RepairJobs.length > 0) {
+                        // Check for repair
+                        GenerateRepairJob(creep);
+                        continue;
+                    }
+                    else {
+                        // Check for maxed storage// low
+                    	let resourceTargets = creep.room.find(FIND_STRUCTURES, {
+                    		filter: (structure) => {
+                    			return (
+                    					structure.structureType == STRUCTURE_EXTENSION ||
+                    					structure.structureType == STRUCTURE_SPAWN ||
+                    					structure.structureType == STRUCTURE_CONTAINER ||
+                    					structure.structureType == STRUCTURE_STORAGE ||
+                    					structure.structureType == STRUCTURE_TOWER) &&
+                    			   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                    		}
+                    	});
+                    	
+                    	if(resourceTargets.length > 0) {
+                    	    GenerateDeliveryJob(creep, resourceTargets[0].id);  
+                            continue;
+                    	}
+                    	else {
+                    	    Log("No Delivery Target");
+                    	}
+                    }
+                }
+                else {
+                    // low
+                	let resourceTargets = creep.room.find(FIND_STRUCTURES, {
+                		filter: (structure) => {
+                			return (
+                					structure.structureType == STRUCTURE_EXTENSION ||
+                					structure.structureType == STRUCTURE_SPAWN ||
+                					structure.structureType == STRUCTURE_CONTAINER ||
+                					structure.structureType == STRUCTURE_STORAGE ||
+                					structure.structureType == STRUCTURE_TOWER) &&
+                			   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                		}
+                	});
+                	
+                	if(resourceTargets.length > 0) {
+                	    GenerateDeliveryJob(creep, resourceTargets[0].id); 
+                        continue; 
+                	}
+                	else {
+                        if(Memory.ConstructionJobs.length > 0) {
+                            // Check for construction
+                            GenerateConstructionJob(creep);
+                            continue;
+                        }
+                        else if(Memory.RepairJobs.length > 0) {
+                            // Check for repair
+                            GenerateRepairJob(creep);
+                            continue;
+                        }
+                	}
+                }
 
-		let role = creep.memory.role;
-		let compatibleJob = Memory.JobBoard.find(element => element.JobType == role);
-
-		if(compatibleJob == null || compatibleJob == undefined){
-			continue;
-		}
-
-		if(compatibleJob.JobType == "Harvester"){
-			ResourceArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			continue;
-		}
-		else if(compatibleJob.JobType == "Upgrader"){
-			ControllerArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			continue;
-		}
-		else if(compatibleJob.JobType == "Builder"){
-			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			continue;
-		}
-		else if(compatibleJob.JobType == "Repairer"){
-			ArchitectArbiter.AssignCreepToJob(creep, compatibleJob.JobId);
-			continue;
-		}
-
-		Log(name + " is unemployed!");
+                // Upgrade
+                GenerateUpgradeJob(creep);
+                continue;
+            }
+        }
     }
 }
 
 function SpawnCreeps() {
-	if(ServiceCreep.Create(ServiceCreepConfig.Harvester, "Spawn1") === true) {
-		return;
-	}
-	if(ServiceCreep.Create(ServiceCreepConfig.Upgrader, "Spawn1") === true) {
-		return;
-	}
-	if(ServiceCreep.Create(ServiceCreepConfig.Builder, "Spawn1") === true) {
+	if(ServiceCreep.Create(ServiceCreepConfig.Handyman, "Spawn1") === true) {
 		return;
 	}
 }
@@ -156,8 +196,10 @@ function SpawnCreeps() {
 function UpdateCreeps() {
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
-		if(creep.spawning === false) {
-			ServiceCreep.Update(creep);
-		}
+        
+		let bAdvance = ServiceCreep.Update(creep);
+        if(bAdvance) {
+            creep.memory.tasks.pop();
+        }
     }
 }

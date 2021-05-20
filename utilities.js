@@ -140,8 +140,27 @@ module.exports.GetResourcePoints = function(_room)
 	for(let idx = 0; idx < resources.length; idx++) {
 		var oResourcePoint = {
 			ResourceId: resources[idx].id,
-			AssignedCreeps: []
+			AssignedCreeps: [],
+			Entrypoints: 0,
 		};
+		
+		const res = Game.getObjectById(oResourcePoint.ResourceId);
+		const reslook = _room.lookForAtArea(LOOK_TERRAIN, res.pos.y-1, res.pos.x-1, res.pos.y+1, res.pos.x+1, true);
+		for(let i = 0; i < reslook.length; i++) {
+	        if(reslook[i].terrain == "wall") {
+	            const found = _room.lookForAt(LOOK_STRUCTURES, reslook[i].x, reslook[i].y);
+	            if(found.length > 0) {
+	                for(let k = 0; k < found.length; k++) {
+	                    if(found[k].structure == "road"){
+	                        oResourcePoint.Entrypoints++;
+	                    }
+	                }
+	            }
+	        }
+	        else {
+	            oResourcePoint.Entrypoints++;
+	        }
+		}
 		aResourcePoints.push(oResourcePoint);
 	}
 	return aResourcePoints;

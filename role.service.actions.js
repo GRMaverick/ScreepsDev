@@ -1,122 +1,157 @@
+//
+// Definition of Creep Tasks
+//  Each task will return a boolean as to determine if the task is finished (true)
+//  or if the task is on going (false).
+//
+
 var Utilities = require('utilities');
 
-function UnassignFromResourcePoint(_creep){
-	for(let i = 0; i < Memory.ResourcePoints.length; i++){
-		let found = Memory.ResourcePoints[i].AssignedCreeps.find(element => element == _creep.name);
-		if(found != null && found != undefined){
-			//debugger;
-			Memory.ResourcePoints[i].AssignedCreeps.splice(found, 1);
-		}
+function Log(_string){
+	if(Memory.TaskLogging) {
+		console.log("[Creep.Tasks]: " + _string);
 	}
 }
 
-module.exports.Build = function(_creep) {
-	UnassignFromResourcePoint(_creep);
+//
+// Build
+//
+module.exports.BuildTask = function(_target){
+    this.Type = "Build";
+    this.Target = _target;
+}
 
-	let jobData = _creep.memory.job;
-	let target = Game.getObjectById(jobData.ConstructionSiteId);
+module.exports.Build = function(_creep, _data) {
+    if(_creep.store.getCapacity() == 0){
+	    Log("Expended Energy!");
+	    return true;
+    }
+    
+	let target = Game.getObjectById(_data.Target);
 	let result = _creep.build(target);
+	if(result == OK){
+	    Log("Building..");
+	    return false;
+	}
 	if(result == ERR_NOT_IN_RANGE) {
 		_creep.moveTo(target);
-		return true;
+		return false;
 	}
-	else if(result != OK) {
+	else {
 		Utilities.LogError("[Build]", result);
-		return false;
-	}
-};
-
-module.exports.Deliver = function(_creep, _data) {
-	UnassignFromResourcePoint(_creep);
-
-	let resourceTargets = _creep.room.find(FIND_STRUCTURES, {
-		filter: (structure) => {
-			return (
-					structure.structureType == STRUCTURE_EXTENSION ||
-					structure.structureType == STRUCTURE_SPAWN ||
-					structure.structureType == STRUCTURE_CONTAINER ||
-					structure.structureType == STRUCTURE_STORAGE ||
-					structure.structureType == STRUCTURE_TOWER) &&
-			   structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-		}
-	});
-
-	if(resourceTargets.length > 0)
-	{
-		let result = _creep.transfer(resourceTargets[0], RESOURCE_ENERGY);
-		if(result == ERR_NOT_IN_RANGE) {
-			_creep.moveTo(resourceTargets[0]);
-			return true;
-		}
-		else if(result != OK) {
-			Utilities.LogError("[Deliver]", result);
-			return false;
-		}
-	}
-};
-
-module.exports.Harvest = function(_creep) {
-	let targetResource = null;
-	for(let i = 0; i < Memory.ResourcePoints.length; i++){
-		var potentialTarget = Game.getObjectById(Memory.ResourcePoints[i].ResourceId);
-		if(potentialTarget.energy > 0) {
-			for(let j = 0; j < Memory.ResourcePoints[i].AssignedCreeps.length; j++){
-				if(_creep.name == Memory.ResourcePoints[i].AssignedCreeps[j]) {
-					targetResource = Memory.ResourcePoints[i];
-				}
-			}
-		}
-	}
-
-	if(targetResource == null) {
-		targetResource = Memory.ResourcePoints.find(element => element.AssignedCreeps.length < 8);
-		targetResource.AssignedCreeps.push(_creep.name);
-	}
-
-	if(targetResource == null) {
-		console.log("PROBLEM");
-	}
-
-	let jobData = _creep.memory.job;
-	let target = Game.getObjectById(targetResource.ResourceId);
-	let result = _creep.harvest(target);
-	if(result == ERR_NOT_IN_RANGE) {
-		_creep.moveTo(target);
 		return true;
 	}
-	else if(result != OK) {
-		Utilities.LogError("[Harvest]", result);
-		return false;
-	}
 };
+
+//
+// Repair
+//
+module.exports.RepairTask = function(_target){
+    this.Type = "Repair";
+    this.Target = _target;
+}
 
 module.exports.Repair = function(_creep, _data) {
-	UnassignFromResourcePoint(_creep);
-
-	let target = Game.getObjectById(_data.targetId);
+    if(_creep.store.getCapacity() == 0){
+	    Log("Expended Energy!");
+	    return true;
+    }
+    
+	let target = Game.getObjectById(_data.Target);
 	let result = _creep.repair(target);
+	if(result == OK){
+	    Log("Repairing..");
+	    return false;
+	}
 	if(result == ERR_NOT_IN_RANGE) {
 		_creep.moveTo(target);
-		return true;
-	}
-	else if(result != OK) 	{
-		Utilities.LogError("[Repair]", result);
 		return false;
+	}
+	else {
+		Utilities.LogError("[Build]", result);
+		return true;
 	}
 };
 
-module.exports.Upgrade = function(_creep) {
-	UnassignFromResourcePoint(_creep);
+//
+// Upgrade
+//
+module.exports.UpgradeTask = function(_target){
+    this.Type = "Upgrade";
+    this.Target = _target;
+}
 
-	let jobData = _creep.memory.job;
-	let target = Game.getObjectById(jobData.ControllerId);
+module.exports.Upgrade = function(_creep, _data) {
+	let target = Game.getObjectById(_data.Target);
 	let result = _creep.upgradeController(target);
-	if(result === ERR_NOT_IN_RANGE) {
-		_creep.moveTo(target);
-		return true;
+	if(_creep.store.getCapacity() == 0) {
+	    Log("Expended Energy!");
+	    return true;
 	}
-	else if(result != OK) {
-		Utilities.LogError("[Upgrade]", result);
+	
+	if(result == OK) {
+	    return false;
+	}
+	else if(result === ERR_NOT_IN_RANGE) {
+		_creep.moveTo(target);
 		return false;
 	}
+	else {
+		Utilities.LogError("[Upgrade]", result);
+		return true;
+	}
 };
+
+//
+// Delivery
+//
+module.exports.DeliverTask = function(_target){
+    this.Type = "Deliver";
+    this.Target = _target;
+}
+
+module.exports.Deliver = function(_creep, _data) {
+    let target = Game.getObjectById(_data.Target);
+    let result = _creep.transfer(target, RESOURCE_ENERGY);
+	if(result == OK) {
+	    return true;
+	}
+	else if(result == ERR_NOT_IN_RANGE) {
+		_creep.moveTo(target);
+		return false;
+	}
+	else {
+		Utilities.LogError("[Deliver]", result);
+		return true;
+	}
+}
+
+//
+// Harvest
+//
+module.exports.HarvestTask = function(_target) {
+    this.Type = "Harvest";
+    this.Target = _target;
+}
+
+module.exports.Harvest = function(_creep, _data) {
+    if(_creep.store.getFreeCapacity() == 0)
+    {
+        Log("Carry Capacity Exceeded");
+        return true;
+    }
+    
+    let target = Game.getObjectById(_data.Target);
+	let result = _creep.harvest(target);
+	if(result == OK) {
+	    Log("Harvesting");
+		return false;
+	}
+	else if(result == ERR_NOT_IN_RANGE) {
+		_creep.moveTo(target);
+		return false;
+	}
+	else {
+		Utilities.LogError("[Harvest]", result);
+		return true;
+	}
+}

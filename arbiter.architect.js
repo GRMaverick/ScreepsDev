@@ -99,7 +99,6 @@ function UpdateConstructionJobs() {
 				ResourcePoints: Utilities.GetResourcePoints(Game.spawns["Spawn1"].room),
 			};
 			Memory.ConstructionJobs.push(job);
-			PostCreatedJob(job.Id, job.Type);
 		}
 	}
 }
@@ -144,7 +143,6 @@ function UpdateRepairJobs()
 				ResourcePoints: Utilities.GetResourcePoints(Game.spawns["Spawn1"].room),
 			};
 			Memory.RepairJobs.push(job);
-			PostCreatedJob(job.Id, job.Type);
 		}
 	}
 }
