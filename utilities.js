@@ -52,24 +52,38 @@ module.exports.PathEndToEnd = function(_startNode, _endNode) {
 			swampCost: 10,
 			roomCallback: function(roomName) {
 				let room = Game.rooms[roomName];
-				if (!room) return;
+				if (!room) {
+				    return;
+				}
 				let costs = new PathFinder.CostMatrix;
-
+                
 				room.find(FIND_STRUCTURES).forEach(function(struct) {
 					if (struct.structureType === STRUCTURE_ROAD) {
 					  costs.set(struct.pos.x, struct.pos.y, 1);
 					}
-					else if (struct.structureType !== STRUCTURE_CONTAINER &&
-							   (struct.structureType !== STRUCTURE_RAMPART ||
-								!struct.my)){
+					else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
 					  costs.set(struct.pos.x, struct.pos.y, 0xff);
 					}
 				});
 
 				// Avoid creeps in the room
-				room.find(FIND_CREEPS).forEach(function(creep){
+				room.find(FIND_CREEPS).forEach(function(creep) {
 					costs.set(creep.pos.x, creep.pos.y, 0xff);
 				});
+				
+				const kRoomSize = 50;
+				for(let i = 0; i < kRoomSize; i++) {
+				    for(let j = 0; j < kRoomSize; j++) {
+				        let found = room.lookAt(LOOK_TERRAIN, i, j, true);
+				        if(found.length > 0) {
+				            for(let k = 0; k < found.length; k++) {
+    				            if(found[k].terrain == "wall") {
+    				                costs.set(i, j, 0xff);
+    				            }
+				            }
+				        }
+				    }
+				}
 
 				return costs;
 			},

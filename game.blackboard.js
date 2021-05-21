@@ -19,10 +19,6 @@ module.exports.Initialise = function() {
 	}
 	
 	Memory.ResourcePoints = Utilities.GetResourcePoints(Game.spawns["Spawn1"].room);
-	Memory.SpawnLogging = false;
-	Memory.BlackboardLogging = false;
-	
-	//GenerateRoadNetwork();
 	
 	Architect.Initialise();
 	Recruiter.Initialise();

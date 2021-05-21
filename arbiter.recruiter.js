@@ -4,7 +4,7 @@ var CreepConfig = require('role.service.config');
 function Log(_string){
 	if(Memory.LogRecruiter)
 	{
-		console.log("[Foreman]: " + _string);
+		console.log("[Recruiter]: " + _string);
 	}
 }
 

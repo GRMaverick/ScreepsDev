@@ -4,12 +4,17 @@ var Services = require('role.service.actions');
 function Log(_string){
 	if(Memory.LogArchitect)
 	{
-		console.log("[ArchitectArbiter]: " + _string);
+		console.log("[Architect]: " + _string);
 	}
 }
 
 function RoadEndToEnd(_startNode, _endNode) {
 	var result = Utilities.PathEndToEnd(_startNode, _endNode);
+	if(result.incomplete == true){
+	    Log("Pathing Failed");
+	    return null;
+	}
+	
 	var results = result.path.length;
 	Log("Path Results: " + results);
 	while(results--) {
@@ -25,9 +30,10 @@ function GenerateRoadNetwork() {
     let spawn = Game.spawns["Spawn1"];
     let controller = Game.spawns["Spawn1"].room.controller;
     
-    RoadEndToEnd(spawn, { pos: controller.pos, range:0});
-    RoadEndToEnd(spawn, { pos: Game.getObjectById(Memory.ResourcePoints[0].ResourceId).pos, range:0});
-    //RoadEndToEnd(spawn, { pos: Game.getObjectById(Memory.ResourcePoints[1].ResourceId).pos, range:0});
+    RoadEndToEnd(spawn, { pos: controller.pos, range:1});
+    for(let i = 0; i < Memory.ResourcePoints.length; i++) {
+        RoadEndToEnd(spawn, { pos: Game.getObjectById(Memory.ResourcePoints[i].ResourceId).pos, range:1});
+    }
 }
 
 module.exports.Initialise = function() {
