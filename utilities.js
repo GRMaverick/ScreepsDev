@@ -1,4 +1,7 @@
 module.exports.LogError = function(_funcName, _error) {
+    if(!Memory.LogErrors){
+        return;
+    }
 	switch(_error) {
 		case ERR_NOT_OWNER: {
 			console.log(_funcName+": ERROR_NOT_OWNER");

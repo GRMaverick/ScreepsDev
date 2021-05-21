@@ -5,6 +5,7 @@ const profiler = require('game.profiler');
 
 profiler.enable();
 module.exports.loop = function () {
+    Memory.LogErrors = DebugToggles.LogErrors;
     Memory.LogCreep = DebugToggles.LogCreep;
     Memory.LogActions = DebugToggles.LogActions;
     Memory.LogForeman = DebugToggles.LogForeman;
