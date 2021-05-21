@@ -3,7 +3,7 @@ var Config = require('role.service.config');
 var Utilities = require('utilities');
 
 function Log(_string){
-	if(Memory.SpawnLogging)	{
+	if(Memory.LogCreep)	{
 		console.log("[Creep]: " + _string);
 	}
 }

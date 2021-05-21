@@ -72,6 +72,7 @@ module.exports.PathEndToEnd = function(_startNode, _endNode) {
 			},
 		}
 	);
+	return result;
 }
 
 module.exports.GetNumOfParts = function(_creepBody, _targetBodyPart) {

@@ -7,7 +7,7 @@
 var Utilities = require('utilities');
 
 function Log(_string){
-	if(Memory.TaskLogging) {
+	if(Memory.LogActions) {
 		console.log("[Creep.Tasks]: " + _string);
 	}
 }
@@ -18,6 +18,7 @@ function Log(_string){
 module.exports.BuildTask = function(_target){
     this.Type = "Build";
     this.Target = _target;
+    Log("Target: "+this.Target);
 }
 
 module.exports.Build = function(_creep, _data) {
@@ -26,6 +27,7 @@ module.exports.Build = function(_creep, _data) {
 	    return true;
     }
     
+    Log("Final Target: "+_data.Target);
 	let target = Game.getObjectById(_data.Target);
 	let result = _creep.build(target);
 	if(result == OK){
