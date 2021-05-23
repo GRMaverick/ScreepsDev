@@ -1,4 +1,4 @@
-module.exports.LogErrors = false;
+module.exports.LogErrors = true;
 module.exports.LogCreep = false;
 module.exports.LogActions = false;
 module.exports.LogForeman = false;

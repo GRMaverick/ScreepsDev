@@ -1,3 +1,5 @@
+var Constants = require('constants');
+
 module.exports.LogError = function(_funcName, _error) {
     if(!Memory.LogErrors){
         return;
@@ -108,28 +110,28 @@ module.exports.CalculateCost = function(_body) {
     for(var i in _body) {
         switch(_body[i]) {
             case MOVE:
-                cost = cost + 50;
+                cost += Constants.CostPerMove;
                 break;
             case WORK:
-                cost = cost + 100;
+                cost += Constants.CostPerWork;
                 break;
             case CARRY:
-                cost = cost + 50;
+                cost += Constants.CostPerCarry;
                 break;
             case ATTACK:
-                cost = cost + 80;
+                cost += Constants.CostPerAttack;
                 break;
             case RANGED_ATTACK:
-                cost = cost + 150;
+                cost += Constants.CostPerRangedAttack;
                 break;
             case HEAL:
-                cost = cost + 250;
+                cost += Constants.CostPerHeal;
                 break;
             case CLAIM:
-                cost = cost + 600;
+                cost += Constants.CostPerClaim;
                 break;
             case TOUGH:
-                cost = cost + 10;
+                cost += Constants.CostPerTough;
                 break;
         }
     }

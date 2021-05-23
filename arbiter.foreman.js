@@ -56,6 +56,18 @@ function GenerateUpgradeTask(_creep) {
     _creep.memory.tasks.push(task);
 }
 
+function TaskHarvester(_creep) {
+    if(_creep.store.getFreeCapacity() > 0) {
+        GenerateHarvestTask(_creep);
+    }
+    else {            	
+        let resourceTargets = FindStoragePoint(_creep);
+    	if(resourceTargets.length > 0) {
+    	    GenerateDeliveryTask(_creep, resourceTargets[0].id);  
+    	}
+    }
+}
+
 function TaskUpgrader(_creep) {
     if(_creep.store.getFreeCapacity() > 0) {
         GenerateHarvestTask(_creep);
@@ -132,6 +144,10 @@ module.exports.Work = function() {
                 }
                 case 'Upgrader': {
                     TaskUpgrader(creep);
+                    break;
+                }
+                case 'Harvester': {
+                    TaskHarvester(creep);
                     break;
                 }
             }

@@ -10,7 +10,7 @@ function Log(_string){
 
 module.exports.Create = function(_config, _spawn) {
 	if( Game.spawns[_spawn].spawning ){ 
-        return true;
+        return false;
 	}
 
 	let maxEnergyAvailable = Game.spawns[_spawn].room.energyCapacityAvailable;

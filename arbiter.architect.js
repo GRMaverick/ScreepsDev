@@ -25,22 +25,39 @@ function RoadEndToEnd(_startNode, _endNode) {
 		}
 	}
 }
+function RoadAround(_node) {
+    for(let j = _node.x - 1; j != _node.x + 2; j++) {
+        for(let k = _node.y - 1; k != _node.y + 2; k++) {
+            if(j == _node.x && k == _node.y) {
+               continue;
+            }
+            let error = Game.rooms.sim.createConstructionSite(j, k, STRUCTURE_ROAD);
+            if(error != OK) {
+		        Utilities.LogError("[RoadConstruction]", error);
+	        }
+        }
+    }
+}
 
 function GenerateRoadNetwork() {
     let spawn = Game.spawns["Spawn1"];
     let controller = Game.spawns["Spawn1"].room.controller;
     
-    RoadEndToEnd(spawn, { pos: controller.pos, range:1});
+    let rpPos = Game.getObjectById(Memory.ResourcePoints[0].ResourceId).pos;
+    
     for(let i = 0; i < Memory.ResourcePoints.length; i++) {
-        RoadEndToEnd(spawn, { pos: Game.getObjectById(Memory.ResourcePoints[i].ResourceId).pos, range:1});
+    let rpPos = Game.getObjectById(Memory.ResourcePoints[i].ResourceId).pos;
+        //RoadAround(rpPos);
+        RoadEndToEnd(spawn, { pos: rpPos, range:1});
     }
+    RoadEndToEnd(spawn, { pos: controller.pos, range:1});
 }
 
 module.exports.Initialise = function() {
 	Memory.ConstructionJobs = [];
 	Memory.RepairJobs = [];
 	
-	GenerateRoadNetwork();
+	//GenerateRoadNetwork();
 	
 	return true;
 }
